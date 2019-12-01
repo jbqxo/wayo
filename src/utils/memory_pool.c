@@ -99,6 +99,7 @@ enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	mtx_lock(&p->lock);
 	struct memp_free_node *candidate = p->head;
 	if (!candidate) {
+	    mtx_unlock(&p->lock);
 	    return MEMP_RC_NOBLOCKS;
 	}
 
