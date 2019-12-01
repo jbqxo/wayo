@@ -27,8 +27,7 @@ OBJS := \
 
 TESTS_OBJS := \
   src/test.o \
-  src/nvim/storage_test.o \
-  src/utils/memory_pool_tests.o \
+  deps/unity/src/unity.c \
   $(filter-out src/main.o, $(OBJS))
 
 
@@ -36,7 +35,7 @@ TESTS_OBJS := \
 all: neobolt_server neobolt_tests
 
 test: neobolt_tests
-	./neobolt_tests
+	@./neobolt_tests
 
 clean:
 	@echo Removing all translation units
@@ -57,15 +56,12 @@ util_memcheck: neobolt_tests
 	valgrind --leak-check=yes --track-origins=yes ./neobolt_tests
 
 neobolt_tests: $(TESTS_OBJS)
-	@echo CXX    $@
-	@$(CXX) -o $@ $(LINKER) $(CFLAGS) $^
+	@echo CC    $@
+	@echo 
+	@$(CC) -o $@ $(LINKER) $(CFLAGS) $^
 
 %.o: %.c
 	@echo CC    $@
 	@$(CC) -std=gnu18 -MD -c -o $@ $(CFLAGS) $(CPPFLAGS) $<
-
-%.o: %.cc
-	@echo CXX    $@
-	@$(CXX) -c -o $@ $(CFLAGS) $(CPPFLAGS) $<
 
 -include $(OBJS:.o=.d)
