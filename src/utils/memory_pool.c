@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "memory_pool.h"
 
@@ -45,7 +46,7 @@ static size_t calc_elem_size(size_t size, size_t alignment)
 	return s;
 }
 
-enum memp_rc memory_pool_init(struct memory_pool *p, size_t capacity,
+int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 			      size_t element_size, size_t element_alignment)
 {
 	assert(capacity != 0);
@@ -76,10 +77,10 @@ enum memp_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 	};
 	mtx_init(&p->lock, mtx_plain);
 
-	return MEMP_RC_OK;
+	return RC_OK;
 
 failed_to_alloc_mem_block:
-	return MEMP_RC_MALLOC_ERR;
+	return -ENOMEM;
 }
 
 void memory_pool_destroy(struct memory_pool *p)
@@ -91,7 +92,7 @@ void memory_pool_destroy(struct memory_pool *p)
 	mtx_destroy(&p->lock);
 }
 
-enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
+int_rc memory_pool_alloc(struct memory_pool *p, void **result)
 {
 	assert(p);
 	assert(result);
@@ -100,7 +101,7 @@ enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	struct memp_free_node *candidate = p->head;
 	if (!candidate) {
 	    mtx_unlock(&p->lock);
-	    return MEMP_RC_NOBLOCKS;
+	    return -ENOSPC;
 	}
 
 	p->head = candidate->next;
@@ -108,10 +109,10 @@ enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	memset(candidate, 0, p->elem_size);
 	*result = candidate;
 
-	return MEMP_RC_OK;
+	return RC_OK;
 }
 
-enum memp_rc memory_pool_free(struct memory_pool *p, void *block)
+void memory_pool_free(struct memory_pool *p, void *block)
 {
 	assert(p);
 	assert(block);
@@ -121,6 +122,4 @@ enum memp_rc memory_pool_free(struct memory_pool *p, void *block)
 	node->next = p->head;
 	p->head = node;
 	mtx_unlock(&p->lock);
-
-	return MEMP_RC_OK;
 }

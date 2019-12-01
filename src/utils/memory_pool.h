@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <threads.h>
 
+#include "util.h"
+
 /* In the current implementation free block accounting is implemented via
  * a linked list of elements pointing to the free blocks; each element is
  * storred in a corresponding free block. */
@@ -49,13 +51,8 @@ struct memory_pool {
 	void *mem_block;
 };
 
-/**
- * @brief Return codes for operations performed on the memory pool.
- */
-enum memp_rc { MEMP_RC_OK = 0, MEMP_RC_MALLOC_ERR, MEMP_RC_NOBLOCKS, MEMP_RC_INVVAL };
-
-enum memp_rc memory_pool_init(struct memory_pool *, size_t capacity,
+int_rc memory_pool_init(struct memory_pool *, size_t capacity,
 			      size_t element_size, size_t element_alignment);
 void memory_pool_destroy(struct memory_pool *);
-enum memp_rc memory_pool_alloc(struct memory_pool *, void **result);
-enum memp_rc memory_pool_free(struct memory_pool *, void *);
+int_rc memory_pool_alloc(struct memory_pool *, void **result);
+void memory_pool_free(struct memory_pool *, void *);
