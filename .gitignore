@@ -4,3 +4,5 @@
 .DS_Store
 compile_commands.json
 neobolt_server
+neobolt_tests
+*.out.*
