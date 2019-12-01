@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <threads.h>
 
 /* In the current implementation free block accounting is implemented via
  * a linked list of elements pointing to the free blocks; each element is
@@ -41,6 +42,7 @@ struct memp_free_node {
 struct memory_pool {
 	/* A linked list of free blocks . */
 	struct memp_free_node *head;
+	mtx_t lock;
 	/* The size of an element. It could be larger than the requested. */
 	size_t elem_size;
 	/* A pointer to the block of memory allocated via malloc. */

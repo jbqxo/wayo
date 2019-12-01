@@ -74,6 +74,7 @@ enum memp_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 	    .head = block,
 	    .elem_size = elem_size
 	};
+	mtx_init(&p->lock, mtx_plain);
 
 	return MEMP_RC_OK;
 
@@ -84,7 +85,10 @@ failed_to_alloc_mem_block:
 void memory_pool_destroy(struct memory_pool *p)
 {
 	assert(p);
+	mtx_lock(&p->lock);
+
 	free(p->mem_block);
+	mtx_destroy(&p->lock);
 }
 
 enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
@@ -92,12 +96,14 @@ enum memp_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	assert(p);
 	assert(result);
 
+	mtx_lock(&p->lock);
 	struct memp_free_node *candidate = p->head;
 	if (!candidate) {
 	    return MEMP_RC_NOBLOCKS;
 	}
 
 	p->head = candidate->next;
+	mtx_unlock(&p->lock);
 	memset(candidate, 0, p->elem_size);
 	*result = candidate;
 
@@ -110,8 +116,10 @@ enum memp_rc memory_pool_free(struct memory_pool *p, void *block)
 	assert(block);
 
 	struct memp_free_node *node = block;
+	mtx_lock(&p->lock);
 	node->next = p->head;
 	p->head = node;
+	mtx_unlock(&p->lock);
 
 	return MEMP_RC_OK;
 }
