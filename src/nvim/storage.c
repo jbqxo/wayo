@@ -1,7 +1,9 @@
 #include <assert.h>
+#include <stdlib.h>
 
 #include "storage.h"
-#include "util.h"
+
+// TODO(Maxim Lyapin): Replace general purpose allocator calls
 
 static size_t hash(struct request_storage *storage, nvim_rpc_msgid id) { 
   return id % storage->capacity;
@@ -11,7 +13,7 @@ void request_storage_init(struct request_storage *storage, int capacity) {
   assert(storage);
   assert(capacity > 0);
 
-  storage->data = xmalloc(capacity * sizeof(*storage->data));
+  storage->data = malloc(capacity * sizeof(*storage->data));
   storage->capacity = capacity;
   storage->length = 0;
   // TODO(Maxim Lyapin): Make the mutex plain.
@@ -36,7 +38,7 @@ void request_storage_destroy(struct request_storage *storage) {
     }
   }
 
-  xfree(storage->data);
+  free(storage->data);
 
   mtx_unlock(&storage->lock);
   mtx_destroy(&storage->lock);
@@ -64,7 +66,7 @@ enum storage_rc request_storage_create_req(struct request_storage *storage,
       return STORAGE_RC_NOSPACE;
     }
   }
-  uv_write_t *uvreq = xmalloc(sizeof(*uvreq));
+  uv_write_t *uvreq = malloc(sizeof(*uvreq));
   storage->data[hash_key] =
       (struct request){.callb = callb, .uvreq = uvreq, .id = (int64_t)id};
   storage->length++;
@@ -111,7 +113,7 @@ enum storage_rc request_storage_free_req(struct request_storage *storage,
   }
 
   req->id = -1;
-  xfree(req->uvreq);
+  free(req->uvreq);
   req->uvreq = NULL;
   req->callb = NULL;
 

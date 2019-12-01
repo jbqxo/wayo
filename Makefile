@@ -20,7 +20,6 @@ DEPS_OBJS := \
 OBJS := \
   src/main.o \
   src/utils/memory_pool.o \
-  src/util.o \
   src/nvim/api.o \
   src/nvim/funcs.o \
   src/nvim/storage.o \
