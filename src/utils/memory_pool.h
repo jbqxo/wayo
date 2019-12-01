@@ -39,12 +39,12 @@ struct memp_free_node {
  * @brief Represents a memory pool object.
  */
 struct memory_pool {
-	/* A pointer to the block of memory allocated via malloc. */
-	void *mem_block;
 	/* A linked list of free blocks . */
 	struct memp_free_node *head;
 	/* The size of an element. It could be larger than the requested. */
 	size_t elem_size;
+	/* A pointer to the block of memory allocated via malloc. */
+	void *mem_block;
 };
 
 /**
