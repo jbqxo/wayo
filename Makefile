@@ -1,9 +1,8 @@
 PROJECT_ROOT = $(shell pwd)
 
-# SANITIZE_CFLAGS := -fsanitize={undefined,address} -fno-omit-frame-pointer \
-  # -fno-optimize-sibling-calls
-DEBUG_CFLAGS := -g # $(SANITIZE_CFLAGS)
-CFLAGS := $(if $(findstring 1,$(NDEBUG)),"-DNDEBUG",$(DEBUG_CFLAGS)) -O2
+DEBUG_CFLAGS := -g
+RELEASE_CFLAGS := -O2 -DNDEBUG
+CFLAGS := $(if $(findstring 1,$(NDEBUG)),$(RELEASE_CFLAGS),$(DEBUG_CFLAGS))
 CPPFLAGS := -I$(PROJECT_ROOT)/src
 LINKER :=
 
@@ -54,6 +53,9 @@ compile_commands.json: clean
 neobolt_server: $(OBJS)
 	@echo CC    $@
 	@$(CC) -o $@ $(LINKER) $(CFLAGS) $^
+
+util_memcheck: neobolt_tests
+	valgrind --leak-check=yes --track-origins=yes ./neobolt_tests
 
 neobolt_tests: $(TESTS_OBJS)
 	@echo CXX    $@
