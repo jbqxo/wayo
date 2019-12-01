@@ -3,7 +3,7 @@ PROJECT_ROOT = $(shell pwd)
 # SANITIZE_CFLAGS := -fsanitize={undefined,address} -fno-omit-frame-pointer \
   # -fno-optimize-sibling-calls
 DEBUG_CFLAGS := -g # $(SANITIZE_CFLAGS)
-CFLAGS := $(if $(findstring 1,$(NDEBUG)),,$(DEBUG_CFLAGS)) -O2
+CFLAGS := $(if $(findstring 1,$(NDEBUG)),"-DNDEBUG",$(DEBUG_CFLAGS)) -O2
 CPPFLAGS := -I$(PROJECT_ROOT)/src
 LINKER :=
 
