@@ -55,7 +55,7 @@ int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 	size_t elem_size = calc_elem_size(element_size, element_alignment);
 
 	size_t req_mem_size = capacity * elem_size;
-	void *block = aligned_alloc(getpagesize(), req_mem_size);
+	void *block = xaligned_alloc(getpagesize(), req_mem_size);
 	if (!block) {
 		goto failed_to_alloc_mem_block;
 	}
@@ -87,7 +87,7 @@ void memory_pool_destroy(struct memory_pool *p)
 	assert(p);
 	mtx_lock(&p->lock);
 
-	free(p->mem_block);
+	xfree(p->mem_block);
 	mtx_destroy(&p->lock);
 }
 

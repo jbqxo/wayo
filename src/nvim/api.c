@@ -42,8 +42,8 @@ void nvim_destroy(struct nvim_api *api) {
 
   mtx_destroy(&api->msg_counter_lock);
 
-  free(api->in);
-  free(api->out);
+  xfree(api->in);
+  xfree(api->out);
   if (api->destroy_func) {
     (*api->destroy_func)(api);
   }
@@ -55,12 +55,12 @@ void nvim_connect_stdio(uv_loop_t *loop, struct nvim_api *api) {
 
   int error = 0;
 
-  uv_tty_t *tty_in = malloc(sizeof(*tty_in));
+  uv_tty_t *tty_in = xmalloc(sizeof(*tty_in));
   error = uv_tty_init(loop, tty_in, 0, 0);
   assert(!error);
   api->in = (uv_stream_t *)tty_in;
 
-  uv_tty_t *tty_out = malloc(sizeof(*tty_out));
+  uv_tty_t *tty_out = xmalloc(sizeof(*tty_out));
   error = uv_tty_init(loop, tty_out, 1, 0);
   assert(!error);
   api->out = (uv_stream_t *)tty_out;
@@ -131,6 +131,6 @@ void nvim_on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
   }
 
   if (buf->base) {
-    free(buf->base);
+    xfree(buf->base);
   }
 }

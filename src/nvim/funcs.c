@@ -31,13 +31,13 @@ static void free_write_buffer(uv_write_t *req, int status) {
   if (status < 0) {
     // TODO(Maxim Lyapin): Log failed write
   }
-  free(req->data);
+  xfree(req->data);
 }
 
 // Global functions
 void nvim_command(struct nvim_api *api, const char *restrict cmd) {
   // TODO(Maxim Lyapin): Replace with memory pool.
-  uv_buf_t *request_buffer = malloc(sizeof(*request_buffer));
+  uv_buf_t *request_buffer = xmalloc(sizeof(*request_buffer));
 
   mpack_writer_t writer;
   mpack_writer_init_growable(&writer, &request_buffer->base, &request_buffer->len);
