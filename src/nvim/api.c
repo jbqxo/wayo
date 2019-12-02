@@ -25,8 +25,8 @@
 #include <string.h>
 
 #include "mpack/mpack.h"
-
 #include "api.h"
+#include "utils/util.h"
 
 // TODO(Maxim Lyapin): Replace general purpose allocator calls
 

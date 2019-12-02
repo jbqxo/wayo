@@ -24,8 +24,8 @@
 
 #include "funcs.h"
 #include "api.h"
-
 #include "storage.h"
+#include "utils/util.h"
 
 static void free_write_buffer(uv_write_t *req, int status) {
   if (status < 0) {
