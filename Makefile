@@ -19,17 +19,15 @@
 #  SOFTWARE.
 #
 
-PROJECT_ROOT = $(shell pwd)
-
 DEBUG_CFLAGS := -g
 RELEASE_CFLAGS := -O2 -DNDEBUG
 CFLAGS := $(if $(findstring 1,$(NDEBUG)),$(RELEASE_CFLAGS),$(DEBUG_CFLAGS))
-CPPFLAGS := -I$(PROJECT_ROOT)/src
+CPPFLAGS := -Isrc
 LINKER :=
 
 # Dependencies
 ## Mpack (msgpack)
-CPPFLAGS := $(CPPFLAGS) -I$(PROJECT_ROOT)/deps -DMPACK_HAS_CONFIG
+CPPFLAGS := $(CPPFLAGS) -Ideps -DMPACK_HAS_CONFIG
 
 ## libuv
 CFLAGS := $(CFLAGS) $(shell pkg-config --cflags libuv)
