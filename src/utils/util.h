@@ -31,44 +31,48 @@
 #define RC_OK 0
 typedef int int_rc;
 
-static void *xmalloc(size_t size) {
-    void *mem = malloc(size);
-    if (unlikely(!mem)) {
-	// TODO(Maxim Lyapin): Add proper error handling.
-	fprintf(stderr, "Couldn't allocate more memory.");
-	exit(EXIT_FAILURE);
-    }
-    return mem;
+static void *xmalloc(size_t size)
+{
+	void *mem = malloc(size);
+	if (unlikely(!mem)) {
+		// TODO(Maxim Lyapin): Add proper error handling.
+		fprintf(stderr, "Couldn't allocate more memory.");
+		exit(EXIT_FAILURE);
+	}
+	return mem;
 }
 
-static void *xcalloc(size_t num, size_t size) {
-    void *mem = calloc(num, size);
-    if (unlikely(!mem)) {
-	// TODO(Maxim Lyapin): Add proper error handling.
-	fprintf(stderr, "Couldn't allocate more memory.");
-	exit(EXIT_FAILURE);
-    }
-    return mem;
+static void *xcalloc(size_t num, size_t size)
+{
+	void *mem = calloc(num, size);
+	if (unlikely(!mem)) {
+		// TODO(Maxim Lyapin): Add proper error handling.
+		fprintf(stderr, "Couldn't allocate more memory.");
+		exit(EXIT_FAILURE);
+	}
+	return mem;
 }
 
-static void *xrealloc(void *ptr, size_t new_size) {
-    void *mem = realloc(ptr, new_size);
-    if (unlikely(!mem)) {
-	// TODO(Maxim Lyapin): Add proper error handling.
-	fprintf(stderr, "Couldn't allocate more memory.");
-	exit(EXIT_FAILURE);
-    }
-    return mem;
+static void *xrealloc(void *ptr, size_t new_size)
+{
+	void *mem = realloc(ptr, new_size);
+	if (unlikely(!mem)) {
+		// TODO(Maxim Lyapin): Add proper error handling.
+		fprintf(stderr, "Couldn't allocate more memory.");
+		exit(EXIT_FAILURE);
+	}
+	return mem;
 }
 
 static void (*xfree)(void *ptr) = free;
 
-static void *xaligned_alloc(size_t alignment, size_t size) {
-    void *mem = aligned_alloc(alignment, size);
-    if (unlikely(!mem)) {
-	// TODO(Maxim Lyapin): Add proper error handling.
-	fprintf(stderr, "Couldn't allocate more memory.");
-	exit(EXIT_FAILURE);
-    }
-    return mem;
+static void *xaligned_alloc(size_t alignment, size_t size)
+{
+	void *mem = aligned_alloc(alignment, size);
+	if (unlikely(!mem)) {
+		// TODO(Maxim Lyapin): Add proper error handling.
+		fprintf(stderr, "Couldn't allocate more memory.");
+		exit(EXIT_FAILURE);
+	}
+	return mem;
 }

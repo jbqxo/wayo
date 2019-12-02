@@ -19,7 +19,7 @@
  *  SOFTWARE.
  */
 
-// Phew. It's quite a mess isn't it? 
+// Phew. It's quite a mess isn't it?
 // TODO(Maxim Lyapin): Make it the same way as throwtheswitch.org suggests.
 
 #include <stdio.h>
@@ -29,33 +29,40 @@
 #include "utils/memory_pool_tests.c"
 #include "nvim/storage_test.c"
 
-void setUp(void) {}
-void tearDown(void) {}
-
-static void util_memory_pool(void) {
-    printf("Testing utils/memory_pool:\n");
-    RUN_TEST(can_allocate_and_free_single_element);
-    RUN_TEST(can_allocate_and_free_many_elements);
-    RUN_TEST(receive_an_error_when_there_are_no_free_blocks);
-    puts("\n");
+void setUp(void)
+{
+}
+void tearDown(void)
+{
 }
 
-static void nvim_storage(void) {
-    printf("Testing nvim/storage:\n");
-    RUN_TEST(add_and_get_one_request_from_the_storage);
-    RUN_TEST(add_and_get_multiple_request_from_the_storage);
-    RUN_TEST(delete_request_from_the_storage);
-    RUN_TEST(return_an_err_when_search_for_a_request_that_doesnt_exist);
-    RUN_TEST(return_an_err_when_there_is_no_space);
-    RUN_TEST(return_an_err_on_duplicated_msgid);
-    puts("\n");
+static void util_memory_pool(void)
+{
+	printf("Testing utils/memory_pool:\n");
+	RUN_TEST(can_allocate_and_free_single_element);
+	RUN_TEST(can_allocate_and_free_many_elements);
+	RUN_TEST(receive_an_error_when_there_are_no_free_blocks);
+	puts("\n");
 }
 
-int main(void) {
-    UNITY_BEGIN();
+static void nvim_storage(void)
+{
+	printf("Testing nvim/storage:\n");
+	RUN_TEST(add_and_get_one_request_from_the_storage);
+	RUN_TEST(add_and_get_multiple_request_from_the_storage);
+	RUN_TEST(delete_request_from_the_storage);
+	RUN_TEST(return_an_err_when_search_for_a_request_that_doesnt_exist);
+	RUN_TEST(return_an_err_when_there_is_no_space);
+	RUN_TEST(return_an_err_on_duplicated_msgid);
+	puts("\n");
+}
 
-    util_memory_pool();
-    nvim_storage();
+int main(void)
+{
+	UNITY_BEGIN();
 
-    return UNITY_END();
+	util_memory_pool();
+	nvim_storage();
+
+	return UNITY_END();
 }

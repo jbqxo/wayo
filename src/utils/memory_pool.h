@@ -52,7 +52,7 @@ struct memory_pool {
 };
 
 int_rc memory_pool_init(struct memory_pool *, size_t capacity,
-			      size_t element_size, size_t element_alignment);
+			size_t element_size, size_t element_alignment);
 void memory_pool_destroy(struct memory_pool *);
 int_rc memory_pool_alloc(struct memory_pool *, void **result);
 void memory_pool_free(struct memory_pool *, void *);

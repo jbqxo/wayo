@@ -47,7 +47,7 @@ static size_t calc_elem_size(size_t size, size_t alignment)
 }
 
 int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
-			      size_t element_size, size_t element_alignment)
+			size_t element_size, size_t element_alignment)
 {
 	assert(capacity != 0);
 	assert(p);
@@ -69,11 +69,9 @@ int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool) {
-	    .mem_block = block,
-	    .head = block,
-	    .elem_size = elem_size
-	};
+	*p = (struct memory_pool){ .mem_block = block,
+				   .head = block,
+				   .elem_size = elem_size };
 	mtx_init(&p->lock, mtx_plain);
 
 	return RC_OK;
@@ -99,8 +97,8 @@ int_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	mtx_lock(&p->lock);
 	struct memp_free_node *candidate = p->head;
 	if (!candidate) {
-	    mtx_unlock(&p->lock);
-	    return -ENOSPC;
+		mtx_unlock(&p->lock);
+		return -ENOSPC;
 	}
 
 	p->head = candidate->next;

@@ -34,12 +34,12 @@ typedef void (*request_callback)(void);
  * @brief A structure that represents a request to the neovim side.
  */
 struct request {
-  union {
-    nvim_rpc_msgid msgid;
-    int64_t id;
-  };
-  uv_write_t *uvreq;
-  request_callback callb;
+	union {
+		nvim_rpc_msgid msgid;
+		int64_t id;
+	};
+	uv_write_t *uvreq;
+	request_callback callb;
 };
 
 // TODO(Maxim Lyapin): Right now, the storage is implemented as a very simple
@@ -52,10 +52,10 @@ struct request {
  * is thread-safe, but individual requests don't.
  */
 struct request_storage {
-  mtx_t lock;
-  struct request *data;
-  int length;
-  int capacity;
+	mtx_t lock;
+	struct request *data;
+	int length;
+	int capacity;
 };
 
 /**
@@ -63,10 +63,10 @@ struct request_storage {
  * request storage.
  */
 enum storage_rc {
-  STORAGE_RC_OK = 0,
-  STORAGE_RC_NOSPACE,
-  STORAGE_RC_DUPLICATE,
-  STORAGE_RC_NOTFOUND,
+	STORAGE_RC_OK = 0,
+	STORAGE_RC_NOSPACE,
+	STORAGE_RC_DUPLICATE,
+	STORAGE_RC_NOTFOUND,
 };
 
 void request_storage_init(struct request_storage *, int capacity);
@@ -85,8 +85,8 @@ void request_storage_destroy(struct request_storage *);
  * @return return code that represents a status of performed operation.
  */
 enum storage_rc request_storage_create_req(struct request_storage *,
-                                           nvim_rpc_msgid, request_callback,
-                                           struct request **result);
+					   nvim_rpc_msgid, request_callback,
+					   struct request **result);
 
 /**
  * @brief Searches for a request with a given msgid.
@@ -99,7 +99,7 @@ enum storage_rc request_storage_create_req(struct request_storage *,
  * @return return code that represents a status of performed operation.
  */
 enum storage_rc request_storage_find(struct request_storage *, nvim_rpc_msgid,
-                                     struct request **result);
+				     struct request **result);
 
 /**
  * @brief Frees all the resources occupied by a request with given id.
@@ -110,4 +110,4 @@ enum storage_rc request_storage_find(struct request_storage *, nvim_rpc_msgid,
  * @return return code.
  */
 enum storage_rc request_storage_free_req(struct request_storage *,
-                                         nvim_rpc_msgid);
+					 nvim_rpc_msgid);
