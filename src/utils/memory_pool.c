@@ -106,7 +106,6 @@ int_rc memory_pool_alloc(struct memory_pool *p, void **result)
 
 	p->head = candidate->next;
 	mtx_unlock(&p->lock);
-	memset(candidate, 0, p->elem_size);
 	*result = candidate;
 
 	return RC_OK;
