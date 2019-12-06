@@ -2,7 +2,5 @@
 **/*.o
 .ccls-cache/
 .DS_Store
+build/
 compile_commands.json
-neobolt_server
-neobolt_tests
-*.out.*

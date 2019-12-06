@@ -131,3 +131,22 @@ void return_an_err_on_duplicated_msgid(void)
 
 	request_storage_destroy(&storage);
 }
+
+void setUp()
+{
+}
+void tearDown()
+{
+}
+
+int main(void)
+{
+	UNITY_BEGIN();
+	RUN_TEST(add_and_get_one_request_from_the_storage);
+	RUN_TEST(add_and_get_multiple_request_from_the_storage);
+	RUN_TEST(delete_request_from_the_storage);
+	RUN_TEST(return_an_err_when_search_for_a_request_that_doesnt_exist);
+	RUN_TEST(return_an_err_when_there_is_no_space);
+	RUN_TEST(return_an_err_on_duplicated_msgid);
+	return UNITY_END();
+}

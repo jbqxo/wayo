@@ -92,3 +92,19 @@ void receive_an_error_when_there_are_no_free_blocks(void)
 
 	memory_pool_destroy(&pool);
 }
+
+void setUp()
+{
+}
+void tearDown()
+{
+}
+
+int main(void)
+{
+	UNITY_BEGIN();
+	RUN_TEST(can_allocate_and_free_single_element);
+	RUN_TEST(can_allocate_and_free_many_elements);
+	RUN_TEST(receive_an_error_when_there_are_no_free_blocks);
+	return UNITY_END();
+}

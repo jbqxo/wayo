@@ -19,50 +19,40 @@
  *  SOFTWARE.
  */
 
-// Phew. It's quite a mess isn't it?
-// TODO(Maxim Lyapin): Make it the same way as throwtheswitch.org suggests.
+#pragma once
 
-#include <stdio.h>
+#include <stddef.h>
+#include <threads.h>
 
-#include "unity/src/unity.h"
+#include "utils/util.h"
 
-#include "utils/memory_pool_tests.c"
-#include "nvim/storage_test.c"
+/* In the current implementation free block accounting is implemented via
+ * a linked list of elements pointing to the free blocks; each element is
+ * storred in a corresponding free block. */
 
-void setUp(void)
-{
-}
-void tearDown(void)
-{
-}
+/**
+ * @brief The structure represents a free node that points to the next free
+ * block and is stored in a free block itself.
+ */
+struct memp_free_node {
+	struct memp_free_node *next;
+};
 
-static void util_memory_pool(void)
-{
-	printf("Testing utils/memory_pool:\n");
-	RUN_TEST(can_allocate_and_free_single_element);
-	RUN_TEST(can_allocate_and_free_many_elements);
-	RUN_TEST(receive_an_error_when_there_are_no_free_blocks);
-	puts("\n");
-}
+/**
+ * @brief Represents a memory pool object.
+ */
+struct memory_pool {
+	/* A linked list of free blocks . */
+	struct memp_free_node *head;
+	mtx_t lock;
+	/* The size of an element. It could be larger than the requested. */
+	size_t elem_size;
+	/* A pointer to the block of memory allocated via malloc. */
+	void *mem_block;
+};
 
-static void nvim_storage(void)
-{
-	printf("Testing nvim/storage:\n");
-	RUN_TEST(add_and_get_one_request_from_the_storage);
-	RUN_TEST(add_and_get_multiple_request_from_the_storage);
-	RUN_TEST(delete_request_from_the_storage);
-	RUN_TEST(return_an_err_when_search_for_a_request_that_doesnt_exist);
-	RUN_TEST(return_an_err_when_there_is_no_space);
-	RUN_TEST(return_an_err_on_duplicated_msgid);
-	puts("\n");
-}
-
-int main(void)
-{
-	UNITY_BEGIN();
-
-	util_memory_pool();
-	nvim_storage();
-
-	return UNITY_END();
-}
+int_rc memory_pool_init(struct memory_pool *, size_t capacity,
+			size_t element_size, size_t element_alignment);
+void memory_pool_destroy(struct memory_pool *);
+int_rc memory_pool_alloc(struct memory_pool *, void **result);
+void memory_pool_free(struct memory_pool *, void *);
