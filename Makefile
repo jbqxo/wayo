@@ -80,32 +80,40 @@ $(PATH_BUILD)/neobolt_server: $(OBJS_APP) $(OBJS_DEPS)
 	$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
 
 test: $(patsubst $(PATH_BUILD_OBJ)/%.o,$(PATH_BUILD_TESTS)/%,$(OBJS_TESTS))
-	@$(foreach t,$^,./$t;)
+	@$(foreach t,$^,\
+	    echo -e "\nRunning $t"; \
+	    ./$t;)
 
 compile_commands.json: clean
 	@compiledb --full-path -o $@ make all
 
+#TODO(Maxim Lyapin): Fix memcheck
 util_memcheck: neobolt_tests
 	valgrind --leak-check=yes --track-origins=yes ./neobolt_tests
 
 $(PATH_BUILD_TESTS)/%_tests: $(PATH_BUILD_OBJ)/%_tests.o $(PATH_BUILD_OBJ)/unity.o \
     $(filter-out $(PATH_BUILD_OBJ)/main.o, $(OBJS_APP)) $(OBJS_DEPS)
-	$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
+	@echo CC $@
+	@$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
 
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_SRC)/%.c | build_dirs
-	$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@echo CC $@
+	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 # Unity build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/unity/src/%.c | build_dirs
-	$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@echo CC $@
+	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 # Mpack build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/mpack/%.c | build_dirs
-	$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@echo CC $@
+	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 # Dependency file gen rule
 $(PATH_BUILD_DEPEND)/%.d: $(PATH_SRC)/%.c | build_dirs
-	$(DEPEND) $@ $<
+	@echo CC $@
+	@$(DEPEND) $@ $<
 
 -include $(patsubst $(PATH_BUILD_OBJ)/%.o, $(PATH_BUILD_DEPEND)/%.d, \
     $(OBJS_APP) \
