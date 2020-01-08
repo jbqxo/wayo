@@ -62,7 +62,7 @@ CPPFLAGS += $(shell pkg-config --cflags libuv)
 LINKERFLAGS += $(shell pkg-config --libs libuv)
 
 .PHONY: all clean test build_dirs
-all: $(PATH_BUILD)/neobolt_server
+all: $(PATH_BUILD)/wayo_server
 
 clean:
 	@echo Removing $(PATH_BUILD)/ dir
@@ -76,7 +76,7 @@ build_dirs:
 	@mkdir -p $(patsubst $(PATH_SRC)/%, $(PATH_BUILD_TESTS)/%, \
 	    $(shell find $(PATH_SRC)/ -type d))
 
-$(PATH_BUILD)/neobolt_server: $(OBJS_APP) $(OBJS_DEPS)
+$(PATH_BUILD)/wayo_server: $(OBJS_APP) $(OBJS_DEPS)
 	@$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
 
 test: $(patsubst $(PATH_BUILD_OBJ)/%.o,$(PATH_BUILD_TESTS)/%,$(OBJS_TESTS))
@@ -88,8 +88,8 @@ compile_commands.json: clean
 	@compiledb --full-path -o $@ make all
 
 #TODO(Maxim Lyapin): Fix memcheck
-util_memcheck: neobolt_tests
-	valgrind --leak-check=yes --track-origins=yes ./neobolt_tests
+util_memcheck: wayo_tests
+	valgrind --leak-check=yes --track-origins=yes ./wayo_tests
 
 $(PATH_BUILD_TESTS)/%_tests: $(PATH_BUILD_OBJ)/%_tests.o $(PATH_BUILD_OBJ)/unity.o \
     $(filter-out $(PATH_BUILD_OBJ)/main.o, $(OBJS_APP)) $(OBJS_DEPS)
