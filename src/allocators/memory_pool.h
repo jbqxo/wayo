@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <threads.h>
 
-#include "utils/util.h"
+#include "util.h"
 
 /* In the current implementation free block accounting is implemented via
  * a linked list of elements pointing to the free blocks; each element is

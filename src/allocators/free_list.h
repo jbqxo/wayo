@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <limits.h>
 
-#include "utils/util.h"
+#include "util.h"
 #include "memory_pool.h"
 
 struct free_list {

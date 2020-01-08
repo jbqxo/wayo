@@ -26,7 +26,7 @@
 #include <assert.h>
 
 #include "free_list.h"
-#include "utils/util.h"
+#include "util.h"
 
 struct header {
 	// The size of the whole memory block including header.

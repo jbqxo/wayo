@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "storage.h"
-#include "utils/util.h"
+#include "util.h"
 
 // TODO(Maxim Lyapin): Replace general purpose allocator calls
 
