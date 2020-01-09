@@ -28,6 +28,14 @@
 
 #include "memory_pool.h"
 
+/**
+ * @brief The structure represents a free node that points to the next free
+ * block and is stored in a free block itself.
+ */
+struct memp_free_node {
+	struct memp_free_node *next;
+};
+
 static size_t calc_elem_size(size_t size, size_t alignment)
 {
 	size_t s = size;
@@ -46,7 +54,7 @@ static size_t calc_elem_size(size_t size, size_t alignment)
 	return s;
 }
 
-int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
+void memory_pool_init(memory_pool *p, size_t capacity,
 			size_t element_size, size_t element_alignment)
 {
 	assert(capacity != 0);
@@ -56,9 +64,6 @@ int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 
 	size_t req_mem_size = capacity * elem_size;
 	void *block = xaligned_alloc(getpagesize(), req_mem_size);
-	if (!block) {
-		goto failed_to_alloc_mem_block;
-	}
 
 	struct memp_free_node *last = block;
 	for (int i = 1; i < capacity; i++) {
@@ -69,18 +74,13 @@ int_rc memory_pool_init(struct memory_pool *p, size_t capacity,
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool){ .mem_block = block,
+	*p = (memory_pool){ .mem_block = block,
 				   .head = block,
 				   .elem_size = elem_size };
 	mtx_init(&p->lock, mtx_plain);
-
-	return RC_OK;
-
-failed_to_alloc_mem_block:
-	return -ENOMEM;
 }
 
-void memory_pool_destroy(struct memory_pool *p)
+void memory_pool_destroy(memory_pool *p)
 {
 	assert(p);
 	mtx_lock(&p->lock);
@@ -89,7 +89,7 @@ void memory_pool_destroy(struct memory_pool *p)
 	mtx_destroy(&p->lock);
 }
 
-int_rc memory_pool_alloc(struct memory_pool *p, void **result)
+void *memory_pool_alloc(memory_pool *p)
 {
 	assert(p);
 	assert(result);
@@ -98,17 +98,15 @@ int_rc memory_pool_alloc(struct memory_pool *p, void **result)
 	struct memp_free_node *candidate = p->head;
 	if (!candidate) {
 		mtx_unlock(&p->lock);
-		return -ENOSPC;
+		return NULL;
 	}
 
 	p->head = candidate->next;
 	mtx_unlock(&p->lock);
-	*result = candidate;
-
-	return RC_OK;
+	return candidate;
 }
 
-void memory_pool_free(struct memory_pool *p, void *block)
+void memory_pool_free(memory_pool *p, void *block)
 {
 	assert(p);
 	assert(block);

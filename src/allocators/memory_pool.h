@@ -31,28 +31,20 @@
  * storred in a corresponding free block. */
 
 /**
- * @brief The structure represents a free node that points to the next free
- * block and is stored in a free block itself.
- */
-struct memp_free_node {
-	struct memp_free_node *next;
-};
-
-/**
  * @brief Represents a memory pool object.
  */
-struct memory_pool {
+typedef struct {
 	/* A linked list of free blocks . */
-	struct memp_free_node *head;
+	void *head;
 	mtx_t lock;
 	/* The size of an element. It could be larger than the requested. */
 	size_t elem_size;
 	/* A pointer to the block of memory allocated via malloc. */
 	void *mem_block;
-};
+} memory_pool;
 
-int_rc memory_pool_init(struct memory_pool *, size_t capacity,
+void memory_pool_init(memory_pool *, size_t capacity,
 			size_t element_size, size_t element_alignment);
-void memory_pool_destroy(struct memory_pool *);
-int_rc memory_pool_alloc(struct memory_pool *, void **result);
-void memory_pool_free(struct memory_pool *, void *);
+void memory_pool_destroy(memory_pool *);
+void *memory_pool_alloc(memory_pool *);
+void memory_pool_free(memory_pool *, void *);
