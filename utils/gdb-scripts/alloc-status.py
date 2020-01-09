@@ -6,7 +6,7 @@ class StatusFreeAlloc(gdb.Command):
     """Free List Allocator status: status_free_alloc allocator_obj
     """
     def __init__(self):
-        gdb.Command.__init__(self, "status_free_alloc", gdb.COMMAND_DATA, gdb.COMPLETE_SYMBOL, True)
+        gdb.Command.__init__(self, "status_free_alloc", gdb.COMMAND_DATA, gdb.COMPLETE_SYMBOL, False)
 
     @staticmethod
     def build_tree(tree, parent, root):
