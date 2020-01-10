@@ -2,6 +2,29 @@ import gdb
 import treelib
 from colorama import Fore, Style
 
+class StatusMemPoolAlloc(gdb.Command):
+    """Memory Pool Allocator status: status_mem_pool
+    """
+    def __init__(self):
+        gdb.Command.__init__(self, "status_mem_pool", gdb.COMMAND_DATA, gdb.COMPLETE_SYMBOL, False)
+
+    def invoke(self, arg, from_tty):
+        if not arg:
+            print("usage: status_mem_pool object")
+            return
+        mp = gdb.parse_and_eval(arg)
+        print("Single element size: %d" % mp['elem_size'])
+        tree = treelib.Tree()
+
+        node_ptr = gdb.lookup_type('struct node').pointer()
+        last = mp['head'].cast(node_ptr)
+        size = 0
+        while last:
+            print("Node #%d: Address 0x%x" % (size, last))
+            last = last['next']
+            size += 1
+        print("Overall elements: %d" % size)
+
 class StatusFreeAlloc(gdb.Command):
     """Free List Allocator status: status_free_alloc allocator_obj
     """
@@ -60,3 +83,4 @@ class StatusFreeAlloc(gdb.Command):
 
 
 StatusFreeAlloc()
+StatusMemPoolAlloc()
