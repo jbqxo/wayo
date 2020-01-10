@@ -26,15 +26,12 @@
 
 void can_allocate_and_free_single_element(void)
 {
-	int_rc rc;
 	struct memory_pool pool;
 
-	rc = memory_pool_init(&pool, 1, sizeof(int), sizeof(int));
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	void *mem = calloc(1, sizeof(int));
+	memory_pool_init(&pool, mem, sizeof(int), sizeof(int), sizeof(int));
 
-	int *result = NULL;
-	rc = memory_pool_alloc(&pool, (void **)&result);
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	int *result = memory_pool_alloc(&pool);
 	TEST_ASSERT_NOT_NULL(result);
 
 	*result = 0xFF;
@@ -48,16 +45,14 @@ void can_allocate_and_free_many_elements(void)
 {
 	const size_t SET_SIZE = 1000;
 
-	int_rc rc;
 	struct memory_pool pool;
 
-	rc = memory_pool_init(&pool, SET_SIZE, sizeof(int), sizeof(int));
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	void *mem = calloc(SET_SIZE, sizeof(int64_t));
+	memory_pool_init(&pool, mem, SET_SIZE * sizeof(int64_t), sizeof(int64_t), sizeof(int64_t));
 
-	int *results[SET_SIZE];
+	int64_t *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		rc = memory_pool_alloc(&pool, (void **)&results[i]);
-		TEST_ASSERT_EQUAL(RC_OK, rc);
+		results[i] = memory_pool_alloc(&pool);
 		TEST_ASSERT_NOT_NULL(results[i]);
 
 		*results[i] = 0xFF;
@@ -72,23 +67,20 @@ void can_allocate_and_free_many_elements(void)
 
 void receive_an_error_when_there_are_no_free_blocks(void)
 {
-	int_rc rc;
 	struct memory_pool pool;
 
-	rc = memory_pool_init(&pool, 2, sizeof(int), sizeof(int));
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	void *mem = calloc(2, sizeof(int64_t));
+	memory_pool_init(&pool, mem, 2 * sizeof(int64_t), sizeof(int64_t), sizeof(int64_t));
 
-	int *results[3];
-	rc = memory_pool_alloc(&pool, (void **)&results[0]);
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	int64_t *results[3];
+	results[0] = memory_pool_alloc(&pool);
 	TEST_ASSERT_NOT_NULL(results[0]);
 
-	rc = memory_pool_alloc(&pool, (void **)&results[1]);
-	TEST_ASSERT_EQUAL(RC_OK, rc);
+	results[1] = memory_pool_alloc(&pool);
 	TEST_ASSERT_NOT_NULL(results[1]);
 
-	rc = memory_pool_alloc(&pool, (void **)&results[2]);
-	TEST_ASSERT_EQUAL(-ENOSPC, rc);
+	results[2] = memory_pool_alloc(&pool);
+	TEST_ASSERT_NULL(results[2]);
 
 	memory_pool_destroy(&pool);
 }

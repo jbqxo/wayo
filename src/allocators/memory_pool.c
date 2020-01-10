@@ -32,45 +32,38 @@
  * @brief The structure represents a free node that points to the next free
  * block and is stored in a free block itself.
  */
-struct memp_free_node {
-	struct memp_free_node *next;
+struct node {
+	struct node *next;
 };
 
 static size_t calc_elem_size(size_t size, size_t alignment)
 {
+	// Check that alignment is a value of power of two.
+	assert((alignment & -alignment) == alignment);
 	size_t s = size;
 
 	// An element must be large enough to store an address in it.
-	if (s < sizeof(struct memp_free_node)) {
-		s = sizeof(struct memp_free_node);
+	if (s < sizeof(struct node)) {
+		s = sizeof(struct node);
 	}
 
-	// TODO(Maxim Lyapin): Check that this is enough to guarantee the alignment of
-	// an element.
-	if (s % alignment != 0) {
-		s += alignment - (s % alignment);
-	}
-
-	return s;
+	return (s + alignment - 1) & -alignment;
 }
 
 void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 		      size_t element_size, size_t element_alignment)
 {
-	assert(capacity != 0);
+	assert(mem);
+	assert(mem_size >= element_size);
 	assert(p);
 
-	size_t elem_size = calc_elem_size(element_size, element_alignment);
+	element_size = calc_elem_size(element_size, element_alignment);
+	void *block = (void *)(((uintptr_t)mem + element_size - 1) & -element_size);
 
-	size_t req_mem_size = capacity * elem_size;
-	void *block = xaligned_alloc(getpagesize(), req_mem_size);
-
-	struct memp_free_node *last = block;
-	for (int i = 1; i < capacity; i++) {
-		struct memp_free_node *node =
-			(struct memp_free_node *)(block + i * elem_size);
-		last->next = node;
-		last = node;
+	struct node *last = block;
+	while ((uintptr_t)last + element_size < (uintptr_t)mem + mem_size) {
+		last->next = (void*)((uintptr_t)last + element_size);
+		last = last->next;
 	}
 	last->next = NULL;
 
@@ -82,18 +75,15 @@ void memory_pool_destroy(struct memory_pool *p)
 {
 	assert(p);
 	mtx_lock(&p->lock);
-
-	xfree(p->mem_block);
 	mtx_destroy(&p->lock);
 }
 
 void *memory_pool_alloc(struct memory_pool *p)
 {
 	assert(p);
-	assert(result);
 
 	mtx_lock(&p->lock);
-	struct memp_free_node *candidate = p->head;
+	struct node *candidate = p->head;
 	if (!candidate) {
 		mtx_unlock(&p->lock);
 		return NULL;
@@ -109,7 +99,7 @@ void memory_pool_free(struct memory_pool *p, void *block)
 	assert(p);
 	assert(block);
 
-	struct memp_free_node *node = block;
+	struct node *node = block;
 	mtx_lock(&p->lock);
 	node->next = p->head;
 	p->head = node;
