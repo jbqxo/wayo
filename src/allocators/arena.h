@@ -22,11 +22,11 @@
 #pragma once
 #include <stddef.h>
 
-typedef struct {
+struct mem_arena {
 	void *current_pos;
 	// The field represents the last available address.
 	void *arena_edge;
-} mem_arena;
+};
 
-void arena_init(mem_arena *, void *mem, size_t mem_size);
-void *arena_alloc(mem_arena *, size_t size, size_t alignment);
+void arena_init(struct mem_arena *, void *mem, size_t mem_size);
+void *arena_alloc(struct mem_arena *, size_t size, size_t alignment);

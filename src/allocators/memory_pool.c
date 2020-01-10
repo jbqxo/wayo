@@ -54,8 +54,8 @@ static size_t calc_elem_size(size_t size, size_t alignment)
 	return s;
 }
 
-void memory_pool_init(memory_pool *p, size_t capacity,
-			size_t element_size, size_t element_alignment)
+void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
+		      size_t element_size, size_t element_alignment)
 {
 	assert(capacity != 0);
 	assert(p);
@@ -74,13 +74,11 @@ void memory_pool_init(memory_pool *p, size_t capacity,
 	}
 	last->next = NULL;
 
-	*p = (memory_pool){ .mem_block = block,
-				   .head = block,
-				   .elem_size = elem_size };
+	*p = (struct memory_pool){ .head = block, .elem_size = element_size };
 	mtx_init(&p->lock, mtx_plain);
 }
 
-void memory_pool_destroy(memory_pool *p)
+void memory_pool_destroy(struct memory_pool *p)
 {
 	assert(p);
 	mtx_lock(&p->lock);
@@ -89,7 +87,7 @@ void memory_pool_destroy(memory_pool *p)
 	mtx_destroy(&p->lock);
 }
 
-void *memory_pool_alloc(memory_pool *p)
+void *memory_pool_alloc(struct memory_pool *p)
 {
 	assert(p);
 	assert(result);
@@ -106,7 +104,7 @@ void *memory_pool_alloc(memory_pool *p)
 	return candidate;
 }
 
-void memory_pool_free(memory_pool *p, void *block)
+void memory_pool_free(struct memory_pool *p, void *block)
 {
 	assert(p);
 	assert(block);
