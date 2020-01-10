@@ -32,7 +32,7 @@ static void can_allocate_all_the_given_memory(void) {
 	const size_t arena_size = sizeof(int64_t) * set_size; 
 	void *mem = malloc(arena_size);
 	assert(mem);
-	arena a;
+	mem_arena a;
 	arena_init(&a, mem, arena_size);
 
 	for (int i = 0; i < set_size; i++) {
@@ -49,7 +49,7 @@ static void cant_allocate_more_than_was_given(void) {
 	const size_t arena_size = sizeof(int64_t) * set_size; 
 	void *mem = malloc(arena_size);
 	assert(mem);
-	arena a;
+	mem_arena a;
 	arena_init(&a, mem, arena_size);
 
 	for (int i = 0; i < set_size; i++) {
@@ -66,7 +66,7 @@ static void cant_allocate_more_than_was_given(void) {
 static void allignment_is_respected(void) {
 	void *mem = malloc(4096);
 	assert(mem);
-	arena a;
+	mem_arena a;
 	arena_init(&a, mem, 4096);
 
 	int16_t *allocated = arena_alloc(&a, sizeof(int16_t), 64);

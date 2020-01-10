@@ -25,7 +25,7 @@
 
 #include "arena.h"
 
-void arena_init(arena *a, void *mem, size_t mem_size)
+void arena_init(mem_arena *a, void *mem, size_t mem_size)
 {
 	assert(a);
 	assert(mem);
@@ -35,7 +35,7 @@ void arena_init(arena *a, void *mem, size_t mem_size)
 	a->arena_edge = mem + mem_size;
 }
 
-void *arena_alloc(arena *a, size_t size, size_t alignment)
+void *arena_alloc(mem_arena *a, size_t size, size_t alignment)
 {
 	assert(a);
 	// Check that alignment is a value of power of two.

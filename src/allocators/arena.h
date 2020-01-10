@@ -26,7 +26,7 @@ typedef struct {
 	void *current_pos;
 	// The field represents the last available address.
 	void *arena_edge;
-} arena;
+} mem_arena;
 
-void arena_init(arena *, void *mem, size_t mem_size);
-void *arena_alloc(arena *, size_t size, size_t alignment);
+void arena_init(mem_arena *, void *mem, size_t mem_size);
+void *arena_alloc(mem_arena *, size_t size, size_t alignment);
