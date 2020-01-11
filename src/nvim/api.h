@@ -25,6 +25,8 @@
 
 #include <uv.h>
 
+#include "allocators/allocators.h"
+
 typedef uint32_t nvim_rpc_msgid;
 struct nvim_api {
 	nvim_rpc_msgid msg_counter;

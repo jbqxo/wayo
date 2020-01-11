@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "arena.h"
+#include "allocators.h"
 
 void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 {

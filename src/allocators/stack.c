@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "stack.h"
+#include "allocators.h"
 
 // In the stack allocator, we could simply store the cursor in the memory block and increase/decrease it during alloc/free.
 // But if we have this header, we may catch some obscure bugs when somebody frees memory not in a LIFO fashion.

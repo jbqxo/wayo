@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "unity/src/unity.h"
-#include "stack.h"
+#include "allocators.h"
 
 static const size_t SET_SIZE = 100;
 

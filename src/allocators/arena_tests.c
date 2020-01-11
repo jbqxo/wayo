@@ -25,7 +25,7 @@
 #include <assert.h>
 #include "unity/src/unity.h"
 
-#include "arena.h"
+#include "allocators.h"
 
 static const size_t SET_SIZE = 100;
 static const size_t ARENA_SIZE = sizeof(int64_t) * SET_SIZE;

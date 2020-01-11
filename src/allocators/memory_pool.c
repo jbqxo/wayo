@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "memory_pool.h"
+#include "allocators.h"
 
 /**
  * @brief The structure represents a free node that points to the next free

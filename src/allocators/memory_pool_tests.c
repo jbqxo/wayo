@@ -23,7 +23,7 @@
 #include <assert.h>
 #include "unity/src/unity.h"
 
-#include "memory_pool.h"
+#include "allocators.h"
 
 static const size_t SET_SIZE = 1000;
 static struct memory_pool POOL;
