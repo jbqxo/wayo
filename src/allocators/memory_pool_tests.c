@@ -20,76 +20,63 @@
  */
 
 #include <errno.h>
+#include <assert.h>
 #include "unity/src/unity.h"
 
 #include "memory_pool.h"
 
+static const size_t SET_SIZE = 1000;
+static struct memory_pool POOL;
+static void *MEMORY;
+
+void setUp()
+{
+	MEMORY = calloc(SET_SIZE, sizeof(int64_t));
+	assert(MEMORY);
+	memory_pool_init(&POOL, MEMORY, sizeof(int64_t) * SET_SIZE, sizeof(int64_t),
+			 sizeof(int64_t));
+}
+
+void tearDown()
+{
+	memory_pool_destroy(&POOL);
+}
+
 void can_allocate_and_free_single_element(void)
 {
-	struct memory_pool pool;
-
-	void *mem = calloc(1, sizeof(int));
-	memory_pool_init(&pool, mem, sizeof(int), sizeof(int), sizeof(int));
-
-	int *result = memory_pool_alloc(&pool);
+	int *result = memory_pool_alloc(&POOL);
 	TEST_ASSERT_NOT_NULL(result);
 
-	*result = 0xFF;
+	*result = -1;
 
-	memory_pool_free(&pool, result);
-
-	memory_pool_destroy(&pool);
+	memory_pool_free(&POOL, result);
 }
 
 void can_allocate_and_free_many_elements(void)
 {
-	const size_t SET_SIZE = 1000;
-
-	struct memory_pool pool;
-
-	void *mem = calloc(SET_SIZE, sizeof(int64_t));
-	memory_pool_init(&pool, mem, SET_SIZE * sizeof(int64_t), sizeof(int64_t), sizeof(int64_t));
-
 	int64_t *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		results[i] = memory_pool_alloc(&pool);
+		results[i] = memory_pool_alloc(&POOL);
 		TEST_ASSERT_NOT_NULL(results[i]);
 
-		*results[i] = 0xFF;
+		*results[i] = -1;
 	}
 
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		memory_pool_free(&pool, results[i]);
+		memory_pool_free(&POOL, results[i]);
 	}
-
-	memory_pool_destroy(&pool);
 }
 
 void receive_an_error_when_there_are_no_free_blocks(void)
 {
-	struct memory_pool pool;
+	for (size_t i = 0; i < SET_SIZE; i++) {
+		int64_t *result = memory_pool_alloc(&POOL);
+		TEST_ASSERT_NOT_NULL(result);
 
-	void *mem = calloc(2, sizeof(int64_t));
-	memory_pool_init(&pool, mem, 2 * sizeof(int64_t), sizeof(int64_t), sizeof(int64_t));
-
-	int64_t *results[3];
-	results[0] = memory_pool_alloc(&pool);
-	TEST_ASSERT_NOT_NULL(results[0]);
-
-	results[1] = memory_pool_alloc(&pool);
-	TEST_ASSERT_NOT_NULL(results[1]);
-
-	results[2] = memory_pool_alloc(&pool);
-	TEST_ASSERT_NULL(results[2]);
-
-	memory_pool_destroy(&pool);
-}
-
-void setUp()
-{
-}
-void tearDown()
-{
+		*result = -1;
+	}
+	void *mem = memory_pool_alloc(&POOL);
+	TEST_ASSERT_NULL(mem);
 }
 
 int main(void)

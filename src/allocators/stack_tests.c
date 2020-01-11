@@ -25,18 +25,28 @@
 #include "unity/src/unity.h"
 #include "stack.h"
 
+static const size_t SET_SIZE = 100;
+
+// Take in account the size of the headers.
+static const size_t STACK_SIZE =
+	SET_SIZE * sizeof(int) + SET_SIZE * (sizeof(size_t) + sizeof(void*));
+static void *mem;
+static struct mem_stack s;
+
+void setUp(void)
+{
+	mem = malloc(STACK_SIZE);
+	assert(mem);
+	stack_init(&s, mem, STACK_SIZE);
+}
+
+void tearDown(void)
+{
+	free(mem);
+}
+
 static void can_perform_simple_allocation(void)
 {
-	const size_t SET_SIZE = 100;
-	// Take in account the size of the headers.
-	const size_t STACK_SIZE =
-		SET_SIZE * sizeof(int) + SET_SIZE * (sizeof(size_t) + sizeof(void*));
-
-	void *mem = malloc(STACK_SIZE);
-	assert(mem);
-	struct mem_stack s;
-	stack_init(&s, mem, STACK_SIZE);
-
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		results[i] = stack_alloc(&s, sizeof(int), 4);
@@ -50,22 +60,10 @@ static void can_perform_simple_allocation(void)
 	}
 	*results[0] = 0;
 	stack_free(&s, results[0]);
-
-	free(mem);
 }
 
 static void cant_allocate_more_than_given(void)
 {
-	const size_t SET_SIZE = 100;
-	// Take in account the size of the headers.
-	const size_t STACK_SIZE =
-		SET_SIZE * sizeof(int) + SET_SIZE * (sizeof(size_t) + sizeof(void*));
-
-	void *mem = malloc(STACK_SIZE);
-	assert(mem);
-	struct mem_stack s;
-	stack_init(&s, mem, STACK_SIZE);
-
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		results[i] = stack_alloc(&s, sizeof(int), 4);
@@ -75,29 +73,17 @@ static void cant_allocate_more_than_given(void)
 
 	int *must_fail = stack_alloc(&s, sizeof(int), 4);
 	TEST_ASSERT_NULL(must_fail);
-	free(mem);
 }
 
 static void allignment_is_respected(void)
 {
-	void *mem = malloc(256);
-	assert(mem);
-	struct mem_stack s;
-	stack_init(&s, mem, 256);
-
 	int *must_be_aligned = stack_alloc(&s, sizeof(int), 128);
 	TEST_ASSERT((uintptr_t)must_be_aligned % 128 == 0);
-	free(mem);
 }
 
 #ifndef NDEBUG
 static void assertion_error_when_not_lifo(void)
 {
-	void *mem = malloc(256);
-	assert(mem);
-	struct mem_stack s;
-	stack_init(&s, mem, 256);
-
 	int *first = stack_alloc(&s, sizeof(int), 8);
 	TEST_ASSERT_NOT_NULL(first);
 
@@ -112,18 +98,9 @@ static void assertion_error_when_not_lifo(void)
 	TEST_FAIL_MESSAGE("We just ruined our stack allocator. Congrats!");
 	stack_free(&s, second);
 	stack_free(&s, third);
-
-	free(mem);
 }
 #endif
 
-void setUp(void)
-{
-}
-
-void tearDown(void)
-{
-}
 
 int main(void)
 {
