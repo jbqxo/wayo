@@ -51,23 +51,29 @@ static size_t calc_elem_size(size_t size, size_t alignment)
 }
 
 void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
-		      size_t element_size, size_t element_alignment)
+		      size_t elem_sz, size_t elem_align)
 {
 	assert(mem);
-	assert(mem_size >= element_size);
+	assert(mem_size >= elem_sz);
 	assert(p);
 
-	element_size = calc_elem_size(element_size, element_alignment);
-	void *block = (void *)(((uintptr_t)mem + element_size - 1) & -element_size);
+	// An element must be large enough to be a node.
+	if (elem_sz < sizeof(struct node)) {
+		elem_sz = sizeof(struct node);
+	}
 
+	void *block = nearest_aligned_addr(mem, elem_align);
 	struct node *last = block;
-	while ((uintptr_t)last + element_size < (uintptr_t)mem + mem_size) {
-		last->next = (void*)((uintptr_t)last + element_size);
-		last = last->next;
+	struct node *next =
+		nearest_aligned_addr((void*)last + elem_sz, elem_align);
+	while ((uintptr_t)next + elem_sz <= (uintptr_t)mem + mem_size) {
+		last->next = next;
+		last = next;
+		next = nearest_aligned_addr((void*)last + elem_sz, elem_align);
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool){ .head = block, .elem_size = element_size };
+	*p = (struct memory_pool){ .head = block, .elem_size = elem_sz };
 	mtx_init(&p->lock, mtx_plain);
 }
 

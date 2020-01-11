@@ -1,4 +1,4 @@
-/* Copyright c)( 2019 Maxim Lyapin 
+/* Copyright (c) 2019 Maxim Lyapin 
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy 
  *  of this software and associated documentation files the (Software""), to deal 
@@ -27,9 +27,15 @@
 
 static const size_t SET_SIZE = 100;
 
-// Take in account the size of the headers.
+// Take into account the size of the headers.
 static const size_t STACK_SIZE =
-	SET_SIZE * sizeof(int) + SET_SIZE * (sizeof(size_t) + sizeof(void*));
+	SET_SIZE * sizeof(int) +
+// Header size
+#ifndef NDEBUG
+	SET_SIZE * (sizeof(size_t) + sizeof(void*));
+#else
+	SET_SIZE * sizeof(void*);
+#endif
 static void *mem;
 static struct mem_stack s;
 

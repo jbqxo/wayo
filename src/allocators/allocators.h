@@ -21,10 +21,18 @@
 
 #pragma once
 
+#include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <threads.h>
 
 #include "util.h"
+
+static inline void *nearest_aligned_addr(void *addr, size_t align) {
+	// Check that alignment is a value of power of two.
+	assert((align & -align) == align);
+	return (void*)(((uintptr_t)addr + align - 1) & -align);
+}
 
 struct mem_arena {
 	void *current_pos;
