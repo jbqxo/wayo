@@ -73,7 +73,7 @@ void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool){ .head = block, .elem_size = elem_sz };
+	*p = (struct memory_pool){ .head = block};
 	mtx_init(&p->lock, mtx_plain);
 }
 
