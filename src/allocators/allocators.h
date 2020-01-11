@@ -24,7 +24,6 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <threads.h>
 
 #include "util.h"
 
@@ -53,9 +52,6 @@ void *arena_alloc(struct mem_arena *, size_t size, size_t alignment);
 struct memory_pool {
 	/* A linked list of free blocks . */
 	void *head;
-	mtx_t lock;
-	/* The size of an element. It could be larger than the requested. */
-	size_t elem_size;
 };
 
 void memory_pool_init(struct memory_pool *, void *mem, size_t mem_size,

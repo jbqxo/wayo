@@ -38,8 +38,6 @@ void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 void *arena_alloc(struct mem_arena *a, size_t size, size_t alignment)
 {
 	assert(a);
-	// Check that alignment is a value of power of two.
-	assert((alignment & -alignment) == alignment);
 
 	void *aligned = nearest_aligned_addr(a->current_pos, alignment);
 	if (aligned + size > a->arena_edge) {

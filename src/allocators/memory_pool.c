@@ -74,29 +74,23 @@ void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 	last->next = NULL;
 
 	*p = (struct memory_pool){ .head = block};
-	mtx_init(&p->lock, mtx_plain);
 }
 
 void memory_pool_destroy(struct memory_pool *p)
 {
 	assert(p);
-	mtx_lock(&p->lock);
-	mtx_destroy(&p->lock);
 }
 
 void *memory_pool_alloc(struct memory_pool *p)
 {
 	assert(p);
 
-	mtx_lock(&p->lock);
 	struct node *candidate = p->head;
 	if (!candidate) {
-		mtx_unlock(&p->lock);
 		return NULL;
 	}
 
 	p->head = candidate->next;
-	mtx_unlock(&p->lock);
 	return candidate;
 }
 
@@ -106,8 +100,6 @@ void memory_pool_free(struct memory_pool *p, void *block)
 	assert(block);
 
 	struct node *node = block;
-	mtx_lock(&p->lock);
 	node->next = p->head;
 	p->head = node;
-	mtx_unlock(&p->lock);
 }
