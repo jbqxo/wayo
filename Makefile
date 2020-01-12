@@ -18,9 +18,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-# I wonder, could it be the most cryptic Makefile?
-# TODO(Maxim Lyapin): Ok, I'm sure there are worse, but really, need to clean it up.
-
 COMPILE := $(CC) -c
 LINK := $(CC)
 DEPEND := $(CC) -MM -MG -MF
@@ -103,12 +100,12 @@ $(PATH_BUILD_OBJ)/%.o:: $(PATH_SRC)/%.c | build_dirs
 # Unity build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/unity/src/%.c | build_dirs
 	@echo CC $@
-	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) -w $< -o $@
 
 # Mpack build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/mpack/%.c | build_dirs
 	@echo CC $@
-	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) -w $< -o $@
 
 # Dependency file gen rule
 $(PATH_BUILD_DEPEND)/%.d: $(PATH_SRC)/%.c | build_dirs

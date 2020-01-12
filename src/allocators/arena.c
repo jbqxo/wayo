@@ -32,18 +32,19 @@ void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 
 	memset(mem, 0, mem_size);
 	a->current_pos = mem;
-	a->arena_edge = mem + mem_size;
+	a->edge_addr = (uintptr_t)mem + mem_size;
 }
 
 void *arena_alloc(struct mem_arena *a, size_t size, size_t alignment)
 {
 	assert(a);
 
-	void *aligned = nearest_aligned_addr(a->current_pos, alignment);
-	if (aligned + size > a->arena_edge) {
+	uintptr_t aligned_addr =
+		nearest_aligned_addr((uintptr_t)a->current_pos, alignment);
+	if ((uintptr_t)aligned_addr + size > a->edge_addr) {
 		return NULL;
 	} else {
-		a->current_pos = aligned + size;
-		return aligned;
+		a->current_pos = (void *)((uintptr_t)aligned_addr + size);
+		return (void*)aligned_addr;
 	}
 }

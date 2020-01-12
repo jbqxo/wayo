@@ -25,7 +25,7 @@
 #include "unity/src/unity.h"
 #include "allocators.h"
 
-static const size_t SET_SIZE = 100;
+#define SET_SIZE 100
 
 // Take into account the size of the headers.
 static const size_t STACK_SIZE =
@@ -56,7 +56,7 @@ static void can_perform_simple_allocation(void)
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		results[i] = stack_alloc(&s, sizeof(int), 4);
-		TEST_ASSERT_NOT_NULL(results[i]);
+		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
 
@@ -73,31 +73,31 @@ static void cant_allocate_more_than_given(void)
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		results[i] = stack_alloc(&s, sizeof(int), 4);
-		TEST_ASSERT_NOT_NULL(results[i]);
+		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
 
 	int *must_fail = stack_alloc(&s, sizeof(int), 4);
-	TEST_ASSERT_NULL(must_fail);
+	TEST_ASSERT_NULL(must_fail)
 }
 
 static void allignment_is_respected(void)
 {
 	int *must_be_aligned = stack_alloc(&s, sizeof(int), 128);
-	TEST_ASSERT((uintptr_t)must_be_aligned % 128 == 0);
+	TEST_ASSERT((uintptr_t)must_be_aligned % 128 == 0)
 }
 
 #ifndef NDEBUG
 static void assertion_error_when_not_lifo(void)
 {
 	int *first = stack_alloc(&s, sizeof(int), 8);
-	TEST_ASSERT_NOT_NULL(first);
+	TEST_ASSERT_NOT_NULL(first)
 
 	int *second = stack_alloc(&s, sizeof(int), 8);
-	TEST_ASSERT_NOT_NULL(second);
+	TEST_ASSERT_NOT_NULL(second)
 
 	int *third = stack_alloc(&s, sizeof(int), 8);
-	TEST_ASSERT_NOT_NULL(third);
+	TEST_ASSERT_NOT_NULL(third)
 
 	TEST_MESSAGE("This test MUST fail");
 	stack_free(&s, first);

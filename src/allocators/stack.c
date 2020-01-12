@@ -41,7 +41,7 @@ void stack_init(struct mem_stack *s, void *mem, size_t mem_size)
 	assert(mem_size > 0);
 
 	*s = (struct mem_stack){ .mem = mem,
-				 .mem_end = mem + mem_size,
+				 .mem_end = (uintptr_t)mem + mem_size,
 				 .cursor = mem };
 }
 
@@ -49,27 +49,28 @@ void *stack_alloc(struct mem_stack *s, size_t size, size_t alignment)
 {
 	assert(s);
 
-	void *aligned = nearest_aligned_addr(s->cursor, alignment);
+	uintptr_t aligned_addr =
+		nearest_aligned_addr((uintptr_t)s->cursor, alignment);
 
 	// If there is not enough space for the header, move to the next aligned position.
 	// Inefficient, but I do not see other solutions.
-	size_t free_space = (uintptr_t)aligned - (uintptr_t)s->cursor;
+	size_t free_space = aligned_addr - (uintptr_t)s->cursor;
 	while (free_space < sizeof(struct header)) {
-		aligned += alignment;
+		aligned_addr += alignment;
 		free_space += alignment;
 	}
-	struct header *h = (void *)aligned - sizeof(struct header);
+	struct header *h = (void*)(aligned_addr - sizeof(struct header));
 
-	void *new_cursor = (void *)aligned + size;
-	if (new_cursor > s->mem_end) {
+	uintptr_t new_cursor_addr = aligned_addr + size;
+	if (new_cursor_addr > s->mem_end) {
 		return NULL;
 	} else {
 #ifndef NDEBUG
 		h->block_size = size;
 #endif
 		h->prev_cursor = s->cursor;
-		s->cursor = new_cursor;
-		return aligned;
+		s->cursor = (void*)new_cursor_addr;
+		return (void*)aligned_addr;
 	}
 }
 
@@ -78,10 +79,10 @@ void stack_free(struct mem_stack *s, void *block)
 	assert(s);
 	assert(block);
 
-	struct header *h = (void*)block - sizeof(struct header);
+	struct header *h = (void*)((uintptr_t)block - sizeof(struct header));
 #ifndef NDEBUG
 	// It will be awkward if somebody will try to deallocate not in a LIFO fashion.
-	assert((void*)block + h->block_size == s->cursor);
+	assert((uintptr_t)block + h->block_size == (uintptr_t)s->cursor);
 #endif
 	s->cursor = h->prev_cursor;
 }

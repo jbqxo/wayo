@@ -36,20 +36,6 @@ struct node {
 	struct node *next;
 };
 
-static size_t calc_elem_size(size_t size, size_t alignment)
-{
-	// Check that alignment is a value of power of two.
-	assert((alignment & -alignment) == alignment);
-	size_t s = size;
-
-	// An element must be large enough to store an address in it.
-	if (s < sizeof(struct node)) {
-		s = sizeof(struct node);
-	}
-
-	return (s + alignment - 1) & -alignment;
-}
-
 void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 		      size_t elem_sz, size_t elem_align)
 {
@@ -62,18 +48,21 @@ void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 		elem_sz = sizeof(struct node);
 	}
 
-	void *block = nearest_aligned_addr(mem, elem_align);
+	void *block = (void *)(uintptr_t)nearest_aligned_addr((uintptr_t)mem,
+							      elem_align);
 	struct node *last = block;
-	struct node *next =
-		nearest_aligned_addr((void*)last + elem_sz, elem_align);
+	struct node *next = (void *)(uintptr_t)nearest_aligned_addr(
+		(uintptr_t)last + elem_sz, elem_align);
+
 	while ((uintptr_t)next + elem_sz <= (uintptr_t)mem + mem_size) {
 		last->next = next;
 		last = next;
-		next = nearest_aligned_addr((void*)last + elem_sz, elem_align);
+		next = (void *)(uintptr_t)nearest_aligned_addr(
+			(uintptr_t)last + elem_sz, elem_align);
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool){ .head = block};
+	*p = (struct memory_pool){ .head = block };
 }
 
 void memory_pool_destroy(struct memory_pool *p)

@@ -27,16 +27,16 @@
 
 #include "util.h"
 
-static inline void *nearest_aligned_addr(void *addr, size_t align) {
+static inline uintptr_t nearest_aligned_addr(uintptr_t addr, size_t align) {
 	// Check that alignment is a value of power of two.
 	assert((align & -align) == align);
-	return (void*)(((uintptr_t)addr + align - 1) & -align);
+	return (addr + align - 1) & -align;
 }
 
 struct mem_arena {
 	void *current_pos;
 	// The field represents the last available address.
-	void *arena_edge;
+	uintptr_t edge_addr;
 };
 
 void arena_init(struct mem_arena *, void *mem, size_t mem_size);
@@ -62,7 +62,7 @@ void memory_pool_free(struct memory_pool *, void *);
 
 struct mem_stack {
 	void *mem;
-	void *mem_end;
+	uintptr_t mem_end;
 
 	void *cursor;
 };

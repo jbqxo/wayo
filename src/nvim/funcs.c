@@ -20,7 +20,7 @@
  */
 
 #include <uv.h>
-#include <mpack/mpack.h>
+#include <mpack.h>
 
 #include "funcs.h"
 #include "api.h"

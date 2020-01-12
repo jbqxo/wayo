@@ -23,8 +23,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mpack.h>
 
-#include "mpack/mpack.h"
 #include "api.h"
 #include "util.h"
 

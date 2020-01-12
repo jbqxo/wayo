@@ -25,7 +25,7 @@
 
 #include "allocators.h"
 
-static const size_t SET_SIZE = 1000;
+#define SET_SIZE 1000
 static struct memory_pool POOL;
 static void *MEMORY;
 
@@ -42,22 +42,22 @@ void tearDown()
 	memory_pool_destroy(&POOL);
 }
 
-void can_allocate_and_free_single_element(void)
+static void can_allocate_and_free_single_element(void)
 {
 	int *result = memory_pool_alloc(&POOL);
-	TEST_ASSERT_NOT_NULL(result);
+	TEST_ASSERT_NOT_NULL(result)
 
 	*result = -1;
 
 	memory_pool_free(&POOL, result);
 }
 
-void can_allocate_and_free_many_elements(void)
+static void can_allocate_and_free_many_elements(void)
 {
 	int64_t *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		results[i] = memory_pool_alloc(&POOL);
-		TEST_ASSERT_NOT_NULL(results[i]);
+		TEST_ASSERT_NOT_NULL(results[i])
 
 		*results[i] = -1;
 	}
@@ -67,16 +67,16 @@ void can_allocate_and_free_many_elements(void)
 	}
 }
 
-void receive_an_error_when_there_are_no_free_blocks(void)
+static void receive_an_error_when_there_are_no_free_blocks(void)
 {
 	for (size_t i = 0; i < SET_SIZE; i++) {
 		int64_t *result = memory_pool_alloc(&POOL);
-		TEST_ASSERT_NOT_NULL(result);
+		TEST_ASSERT_NOT_NULL(result)
 
 		*result = -1;
 	}
 	void *mem = memory_pool_alloc(&POOL);
-	TEST_ASSERT_NULL(mem);
+	TEST_ASSERT_NULL(mem)
 }
 
 int main(void)
