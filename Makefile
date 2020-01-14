@@ -35,7 +35,8 @@ SRC_TESTS := $(shell find $(PATH_SRC) -name '*_tests.c')
 SRC_APP := $(filter-out $(SRC_TESTS), $(shell find $(PATH_SRC) -name '*.c'))
 
 CPPFLAGS := -I$(PATH_SRC) -I$(PATH_DEPS)
-CFLAGS := -std=gnu18 -Weverything -pedantic-errors
+CFLAGS := -std=c17 -Weverything -pedantic-errors \
+    -Wno-c++98-compat
 
 DEBUG_CFLAGS := -g
 RELEASE_CFLAGS := -O2 -DNDEBUG
