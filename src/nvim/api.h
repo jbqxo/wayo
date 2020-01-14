@@ -34,8 +34,6 @@ struct nvim_api {
 
 	uv_stream_t *in;
 	uv_stream_t *out;
-
-	void (*destroy_func)(struct nvim_api *);
 };
 
 // See: https://github.com/msgpack-rpc/msgpack-rpc/blob/e6a28c4b71638b61ea11469917b030df45ef8081/spec.md
@@ -46,7 +44,6 @@ enum nvim_rpc_type {
 };
 
 void nvim_init(struct nvim_api *);
-void nvim_destroy(struct nvim_api *);
 void nvim_connect_stdio(uv_loop_t *, struct nvim_api *);
 void nvim_on_read(uv_stream_t *, ssize_t nread, const uv_buf_t *);
 nvim_rpc_msgid nvim_next_msgid(struct nvim_api *api);

@@ -38,19 +38,6 @@ void nvim_init(struct nvim_api *api)
 	mtx_init(&api->msg_counter_lock, mtx_plain);
 }
 
-void nvim_destroy(struct nvim_api *api)
-{
-	assert(api);
-
-	mtx_destroy(&api->msg_counter_lock);
-
-	xfree(api->in);
-	xfree(api->out);
-	if (api->destroy_func) {
-		(*api->destroy_func)(api);
-	}
-}
-
 void nvim_connect_stdio(uv_loop_t *loop, struct nvim_api *api)
 {
 	// TODO(Maxim Lyapin): Properly handle errors.
@@ -67,8 +54,6 @@ void nvim_connect_stdio(uv_loop_t *loop, struct nvim_api *api)
 	error = uv_tty_init(loop, tty_out, 1, 0);
 	assert(!error);
 	api->out = (uv_stream_t *)tty_out;
-
-	api->destroy_func = NULL;
 }
 
 nvim_rpc_msgid nvim_next_msgid(struct nvim_api *api)
