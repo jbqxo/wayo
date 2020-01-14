@@ -45,7 +45,7 @@ void stack_init(struct mem_stack *s, void *mem, size_t mem_size)
 				 .cursor = mem };
 }
 
-void *stack_alloc(struct mem_stack *s, size_t size, size_t alignment)
+void *stack_aligned_alloc(struct mem_stack *s, size_t size, size_t alignment)
 {
 	assert(s);
 
@@ -72,6 +72,10 @@ void *stack_alloc(struct mem_stack *s, size_t size, size_t alignment)
 		s->cursor = (void*)new_cursor_addr;
 		return (void*)aligned_addr;
 	}
+}
+
+void *stack_alloc(struct mem_stack *s, size_t size) {
+	return stack_aligned_alloc(s, size, DEFAULT_ALIGNMENT);
 }
 
 void stack_free(struct mem_stack *s, void *block)

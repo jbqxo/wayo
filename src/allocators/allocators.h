@@ -24,8 +24,11 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdalign.h>
 
 #include "util.h"
+
+#define DEFAULT_ALIGNMENT alignof(max_align_t)
 
 static inline uintptr_t nearest_aligned_addr(uintptr_t addr, size_t align) {
 	// Check that alignment is a value of power of two.
@@ -40,7 +43,8 @@ struct mem_arena {
 };
 
 void arena_init(struct mem_arena *, void *mem, size_t mem_size);
-void *arena_alloc(struct mem_arena *, size_t size, size_t alignment);
+void *arena_aligned_alloc(struct mem_arena *, size_t size, size_t alignment);
+void *arena_alloc(struct mem_arena *, size_t size);
 
 
 /* In the current implementation free block accounting is implemented via
@@ -68,6 +72,7 @@ struct mem_stack {
 };
 
 void stack_init(struct mem_stack *, void *mem, size_t mem_size);
-void *stack_alloc(struct mem_stack *, size_t size, size_t alignment);
+void *stack_aligned_alloc(struct mem_stack *, size_t size, size_t alignment);
+void *stack_alloc(struct mem_stack *, size_t size);
 void stack_free(struct mem_stack *, void *block);
 

@@ -35,7 +35,7 @@ void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 	a->edge_addr = (uintptr_t)mem + mem_size;
 }
 
-void *arena_alloc(struct mem_arena *a, size_t size, size_t alignment)
+void *arena_aligned_alloc(struct mem_arena *a, size_t size, size_t alignment)
 {
 	assert(a);
 
@@ -47,4 +47,8 @@ void *arena_alloc(struct mem_arena *a, size_t size, size_t alignment)
 		a->current_pos = (void *)((uintptr_t)aligned_addr + size);
 		return (void*)aligned_addr;
 	}
+}
+
+void *arena_alloc(struct mem_arena *a, size_t size) {
+	return arena_aligned_alloc(a, size, DEFAULT_ALIGNMENT);
 }

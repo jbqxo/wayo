@@ -47,7 +47,7 @@ void tearDown()
 static void can_allocate_all_the_given_memory(void)
 {
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		int64_t *mem = arena_alloc(&ARENA, sizeof(int64_t), 8);
+		int64_t *mem = arena_alloc(&ARENA, sizeof(int64_t));
 		TEST_ASSERT_NOT_NULL(mem)
 		*mem = -1;
 	}
@@ -58,17 +58,17 @@ static void cant_allocate_more_than_was_given(void)
 {
 	int64_t *mem;
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		mem = arena_alloc(&ARENA, sizeof(int64_t), 8);
+		mem = arena_alloc(&ARENA, sizeof(int64_t));
 		TEST_ASSERT_NOT_NULL(mem)
 		*mem = -1;
 	}
-	mem = arena_alloc(&ARENA, sizeof(int64_t), 64);
+	mem = arena_alloc(&ARENA, sizeof(int64_t));
 	TEST_ASSERT_NULL(mem)
 }
 
 static void allignment_is_respected(void)
 {
-	int16_t *allocated = arena_alloc(&ARENA, sizeof(int16_t), 64);
+	int16_t *allocated = arena_aligned_alloc(&ARENA, sizeof(int16_t), 64);
 	TEST_ASSERT_NOT_NULL(allocated)
 	*allocated = -1;
 	TEST_ASSERT((uintptr_t)allocated % 64 == 0)
