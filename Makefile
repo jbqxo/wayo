@@ -56,6 +56,7 @@ OBJS_DEPS := \
 CPPFLAGS += -DMPACK_HAS_CONFIG
 
 ## libuv
+CFLAGS += -D_GNU_SOURCE
 CPPFLAGS += $(shell pkg-config --cflags libuv)
 LINKERFLAGS += $(shell pkg-config --libs libuv)
 
