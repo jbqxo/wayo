@@ -85,10 +85,6 @@ test: $(patsubst $(PATH_BUILD_OBJ)/%.o,$(PATH_BUILD_TESTS)/%,$(OBJS_TESTS))
 compile_commands.json: clean
 	@compiledb --full-path -o $@ make all
 
-#TODO(Maxim Lyapin): Fix memcheck
-util_memcheck: wayo_tests
-	valgrind --leak-check=yes --track-origins=yes ./wayo_tests
-
 $(PATH_BUILD_TESTS)/%_tests: $(PATH_BUILD_OBJ)/%_tests.o $(PATH_BUILD_OBJ)/unity.o \
     $(filter-out $(PATH_BUILD_OBJ)/main.o, $(OBJS_APP)) $(OBJS_DEPS)
 	@echo CC $@
