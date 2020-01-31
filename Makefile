@@ -18,9 +18,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-COMPILE := $(CC) -c
-LINK := $(CC)
-DEPEND := $(CC) -MM -MG -MF
+CC ?= clang
 
 PATH_DEPS := deps
 PATH_SRC := src
@@ -35,7 +33,7 @@ SRC_TESTS := $(shell find $(PATH_SRC) -name '*_tests.c')
 SRC_APP := $(filter-out $(SRC_TESTS), $(shell find $(PATH_SRC) -name '*.c'))
 
 CPPFLAGS := -I$(PATH_SRC) -I$(PATH_DEPS)
-CFLAGS := -std=c17 -Weverything -pedantic-errors \
+CFLAGS := -std=c18 -Weverything -pedantic-errors \
     -Wno-c++98-compat
 
 DEBUG_CFLAGS := -g
@@ -89,26 +87,26 @@ compile_commands.json: clean
 $(PATH_BUILD_TESTS)/%_tests: $(PATH_BUILD_OBJ)/%_tests.o $(PATH_BUILD_OBJ)/unity.o \
     $(filter-out $(PATH_BUILD_OBJ)/main.o, $(OBJS_APP)) $(OBJS_DEPS)
 	@echo CC $@
-	@$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
+	@$(CC) -o $@ $^ $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) 
 
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_SRC)/%.c | build_dirs
 	@echo CC $@
-	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) $< -o $@
+	@$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS) 
 
 # Unity build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/unity/src/%.c | build_dirs
 	@echo CC $@
-	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) -w $< -o $@
+	@$(CC) -c -w $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 # Mpack build rule
 $(PATH_BUILD_OBJ)/%.o:: $(PATH_DEPS)/mpack/%.c | build_dirs
 	@echo CC $@
-	@$(COMPILE) $(CFLAGS) $(CPPFLAGS) -w $< -o $@
+	@$(CC) -c -w $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 # Dependency file gen rule
 $(PATH_BUILD_DEPEND)/%.d: $(PATH_SRC)/%.c | build_dirs
 	@echo CC $@
-	@$(DEPEND) $@ $<
+	@$(CC) $< -MM -MG -MF $@
 
 -include $(patsubst $(PATH_BUILD_OBJ)/%.o, $(PATH_BUILD_DEPEND)/%.d, \
     $(OBJS_APP) \
