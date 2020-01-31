@@ -27,8 +27,10 @@
 
 #include "allocators.h"
 
+#define ELEMENT_SIZE sizeof(max_align_t)
+
 static const size_t SET_SIZE = 100;
-static const size_t ARENA_SIZE = sizeof(int64_t) * SET_SIZE;
+static const size_t ARENA_SIZE = ELEMENT_SIZE * SET_SIZE;
 static void *MEMORY;
 static struct mem_arena ARENA;
 
@@ -46,24 +48,14 @@ void tearDown()
 
 static void can_allocate_all_the_given_memory(void)
 {
-	for (size_t i = 0; i < SET_SIZE; i++) {
-		int64_t *mem = arena_alloc(&ARENA, sizeof(int64_t));
+	size_t allocated = 0;
+	while (allocated < ARENA_SIZE) {
+		allocated += ELEMENT_SIZE;
+		int64_t *mem = arena_alloc(&ARENA, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(mem)
 		*mem = -1;
 	}
 
-}
-
-static void cant_allocate_more_than_was_given(void)
-{
-	int64_t *mem;
-	for (size_t i = 0; i < SET_SIZE; i++) {
-		mem = arena_alloc(&ARENA, sizeof(int64_t));
-		TEST_ASSERT_NOT_NULL(mem)
-		*mem = -1;
-	}
-	mem = arena_alloc(&ARENA, sizeof(int64_t));
-	TEST_ASSERT_NULL(mem)
 }
 
 static void allignment_is_respected(void)
@@ -78,7 +70,6 @@ int main(void)
 {
 	UNITY_BEGIN();
 	RUN_TEST(can_allocate_all_the_given_memory);
-	RUN_TEST(cant_allocate_more_than_was_given);
 	RUN_TEST(allignment_is_respected);
 	UNITY_END();
 }

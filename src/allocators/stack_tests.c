@@ -26,10 +26,11 @@
 #include "allocators.h"
 
 #define SET_SIZE 100
+#define ELEMENT_SIZE sizeof(max_align_t)
 
 // Take into account the size of the headers.
 static const size_t STACK_SIZE =
-	SET_SIZE * sizeof(int) +
+	SET_SIZE * ELEMENT_SIZE +
 // Header size
 #ifndef NDEBUG
 	SET_SIZE * (sizeof(size_t) + sizeof(void*));
@@ -55,7 +56,7 @@ static void can_perform_simple_allocation(void)
 {
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		results[i] = stack_alloc(&s, sizeof(int));
+		results[i] = stack_alloc(&s, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
@@ -72,31 +73,31 @@ static void cant_allocate_more_than_given(void)
 {
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		results[i] = stack_alloc(&s, sizeof(int));
+		results[i] = stack_alloc(&s, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
 
-	int *must_fail = stack_alloc(&s, sizeof(int));
+	int *must_fail = stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NULL(must_fail)
 }
 
 static void allignment_is_respected(void)
 {
-	int *must_be_aligned = stack_aligned_alloc(&s, sizeof(int), 128);
+	int *must_be_aligned = stack_aligned_alloc(&s, ELEMENT_SIZE, 128);
 	TEST_ASSERT((uintptr_t)must_be_aligned % 128 == 0)
 }
 
 #ifndef NDEBUG
 static void assertion_error_when_not_lifo(void)
 {
-	int *first = stack_alloc(&s, sizeof(int));
+	int *first = stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(first)
 
-	int *second = stack_alloc(&s, sizeof(int));
+	int *second = stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(second)
 
-	int *third = stack_alloc(&s, sizeof(int));
+	int *third = stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(third)
 
 	TEST_MESSAGE("This test MUST fail");
