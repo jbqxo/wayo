@@ -36,7 +36,7 @@ struct node {
 	struct node *next;
 };
 
-void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
+void mem_pool_init(struct mem_pool *p, void *mem, size_t mem_size,
 		      size_t elem_sz, size_t elem_align)
 {
 	assert(mem);
@@ -62,15 +62,15 @@ void memory_pool_init(struct memory_pool *p, void *mem, size_t mem_size,
 	}
 	last->next = NULL;
 
-	*p = (struct memory_pool){ .head = block };
+	*p = (struct mem_pool){ .head = block };
 }
 
-void memory_pool_destroy(struct memory_pool *p)
+void mem_pool_destroy(struct mem_pool *p)
 {
 	assert(p);
 }
 
-void *memory_pool_alloc(struct memory_pool *p)
+void *mem_pool_alloc(struct mem_pool *p)
 {
 	assert(p);
 
@@ -83,7 +83,7 @@ void *memory_pool_alloc(struct memory_pool *p)
 	return candidate;
 }
 
-void memory_pool_free(struct memory_pool *p, void *block)
+void mem_pool_free(struct mem_pool *p, void *block)
 {
 	assert(p);
 	assert(block);

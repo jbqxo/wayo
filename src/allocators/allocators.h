@@ -42,9 +42,9 @@ struct mem_arena {
 	uintptr_t edge_addr;
 };
 
-void arena_init(struct mem_arena *, void *mem, size_t mem_size);
-void *arena_aligned_alloc(struct mem_arena *, size_t size, size_t alignment);
-void *arena_alloc(struct mem_arena *, size_t size);
+void mem_arena_init(struct mem_arena *, void *mem, size_t mem_size);
+void *mem_arena_aligned_alloc(struct mem_arena *, size_t size, size_t alignment);
+void *mem_arena_alloc(struct mem_arena *, size_t size);
 
 
 /* In the current implementation free block accounting is implemented via
@@ -53,16 +53,16 @@ void *arena_alloc(struct mem_arena *, size_t size);
 /**
  * @brief Represents a memory pool object.
  */
-struct memory_pool {
+struct mem_pool {
 	/* A linked list of free blocks . */
 	void *head;
 };
 
-void memory_pool_init(struct memory_pool *, void *mem, size_t mem_size,
+void mem_pool_init(struct mem_pool *, void *mem, size_t mem_size,
 			size_t element_size, size_t element_alignment);
-void memory_pool_destroy(struct memory_pool *);
-void *memory_pool_alloc(struct memory_pool *);
-void memory_pool_free(struct memory_pool *, void *);
+void mem_pool_destroy(struct mem_pool *);
+void *mem_pool_alloc(struct mem_pool *);
+void mem_pool_free(struct mem_pool *, void *);
 
 struct mem_stack {
 	void *mem;
@@ -71,8 +71,8 @@ struct mem_stack {
 	void *cursor;
 };
 
-void stack_init(struct mem_stack *, void *mem, size_t mem_size);
-void *stack_aligned_alloc(struct mem_stack *, size_t size, size_t alignment);
-void *stack_alloc(struct mem_stack *, size_t size);
-void stack_free(struct mem_stack *, void *block);
+void mem_stack_init(struct mem_stack *, void *mem, size_t mem_size);
+void *mem_stack_aligned_alloc(struct mem_stack *, size_t size, size_t alignment);
+void *mem_stack_alloc(struct mem_stack *, size_t size);
+void mem_stack_free(struct mem_stack *, void *block);
 

@@ -44,7 +44,7 @@ void setUp(void)
 {
 	mem = malloc(STACK_SIZE);
 	assert(mem);
-	stack_init(&s, mem, STACK_SIZE);
+	mem_stack_init(&s, mem, STACK_SIZE);
 }
 
 void tearDown(void)
@@ -56,55 +56,55 @@ static void can_perform_simple_allocation(void)
 {
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		results[i] = stack_alloc(&s, ELEMENT_SIZE);
+		results[i] = mem_stack_alloc(&s, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
 
 	for (size_t i = SET_SIZE - 1; i > 0; i--) {
 		*results[i] = 0;
-		stack_free(&s, results[i]);
+		mem_stack_free(&s, results[i]);
 	}
 	*results[0] = 0;
-	stack_free(&s, results[0]);
+	mem_stack_free(&s, results[0]);
 }
 
 static void cant_allocate_more_than_given(void)
 {
 	int *results[SET_SIZE];
 	for (size_t i = 0; i < SET_SIZE; i++) {
-		results[i] = stack_alloc(&s, ELEMENT_SIZE);
+		results[i] = mem_stack_alloc(&s, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(results[i])
 		*results[i] = -1;
 	}
 
-	int *must_fail = stack_alloc(&s, ELEMENT_SIZE);
+	int *must_fail = mem_stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NULL(must_fail)
 }
 
 static void allignment_is_respected(void)
 {
-	int *must_be_aligned = stack_aligned_alloc(&s, ELEMENT_SIZE, 128);
+	int *must_be_aligned = mem_stack_aligned_alloc(&s, ELEMENT_SIZE, 128);
 	TEST_ASSERT((uintptr_t)must_be_aligned % 128 == 0)
 }
 
 #ifndef NDEBUG
 static void assertion_error_when_not_lifo(void)
 {
-	int *first = stack_alloc(&s, ELEMENT_SIZE);
+	int *first = mem_stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(first)
 
-	int *second = stack_alloc(&s, ELEMENT_SIZE);
+	int *second = mem_stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(second)
 
-	int *third = stack_alloc(&s, ELEMENT_SIZE);
+	int *third = mem_stack_alloc(&s, ELEMENT_SIZE);
 	TEST_ASSERT_NOT_NULL(third)
 
 	TEST_MESSAGE("This test MUST fail");
-	stack_free(&s, first);
+	mem_stack_free(&s, first);
 	TEST_FAIL_MESSAGE("We just ruined our stack allocator. Congrats!");
-	stack_free(&s, second);
-	stack_free(&s, third);
+	mem_stack_free(&s, second);
+	mem_stack_free(&s, third);
 }
 #endif
 

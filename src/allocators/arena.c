@@ -25,7 +25,7 @@
 
 #include "allocators.h"
 
-void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
+void mem_arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 {
 	assert(a);
 	assert(mem);
@@ -35,7 +35,7 @@ void arena_init(struct mem_arena *a, void *mem, size_t mem_size)
 	a->edge_addr = (uintptr_t)mem + mem_size;
 }
 
-void *arena_aligned_alloc(struct mem_arena *a, size_t size, size_t alignment)
+void *mem_arena_aligned_alloc(struct mem_arena *a, size_t size, size_t alignment)
 {
 	assert(a);
 
@@ -49,6 +49,6 @@ void *arena_aligned_alloc(struct mem_arena *a, size_t size, size_t alignment)
 	}
 }
 
-void *arena_alloc(struct mem_arena *a, size_t size) {
-	return arena_aligned_alloc(a, size, DEFAULT_ALIGNMENT);
+void *mem_arena_alloc(struct mem_arena *a, size_t size) {
+	return mem_arena_aligned_alloc(a, size, DEFAULT_ALIGNMENT);
 }

@@ -72,7 +72,7 @@ struct listener {
 	fn_handler on_notify;
 
 	struct mem_stack *glob_alloc;
-	struct memory_pool *reqpool;
+	struct mem_pool *reqpool;
 	size_t reqpool_block_sz;
 
 	// Context of the request being handled.
@@ -80,6 +80,6 @@ struct listener {
 };
 
 void listener_init(struct listener *l, uv_loop_t *loop,
-		   struct mem_stack *glob_alloc, struct memory_pool *reqpool,
+		   struct mem_stack *glob_alloc, struct mem_pool *reqpool,
 		   size_t reqpool_block_sz, fn_handler on_request,
 		   fn_handler on_response, fn_handler on_notify);

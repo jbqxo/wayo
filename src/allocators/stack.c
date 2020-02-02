@@ -34,7 +34,7 @@ struct header {
 #endif
 };
 
-void stack_init(struct mem_stack *s, void *mem, size_t mem_size)
+void mem_stack_init(struct mem_stack *s, void *mem, size_t mem_size)
 {
 	assert(s);
 	assert(mem);
@@ -45,7 +45,7 @@ void stack_init(struct mem_stack *s, void *mem, size_t mem_size)
 				 .cursor = mem };
 }
 
-void *stack_aligned_alloc(struct mem_stack *s, size_t size, size_t alignment)
+void *mem_stack_aligned_alloc(struct mem_stack *s, size_t size, size_t alignment)
 {
 	assert(s);
 
@@ -74,11 +74,11 @@ void *stack_aligned_alloc(struct mem_stack *s, size_t size, size_t alignment)
 	}
 }
 
-void *stack_alloc(struct mem_stack *s, size_t size) {
-	return stack_aligned_alloc(s, size, DEFAULT_ALIGNMENT);
+void *mem_stack_alloc(struct mem_stack *s, size_t size) {
+	return mem_stack_aligned_alloc(s, size, DEFAULT_ALIGNMENT);
 }
 
-void stack_free(struct mem_stack *s, void *block)
+void mem_stack_free(struct mem_stack *s, void *block)
 {
 	assert(s);
 	assert(block);

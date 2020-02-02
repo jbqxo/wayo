@@ -38,7 +38,7 @@ void setUp()
 {
 	MEMORY = malloc(ARENA_SIZE);
 	assert(MEMORY);
-	arena_init(&ARENA, MEMORY, ARENA_SIZE);
+	mem_arena_init(&ARENA, MEMORY, ARENA_SIZE);
 }
 
 void tearDown()
@@ -51,7 +51,7 @@ static void can_allocate_all_the_given_memory(void)
 	size_t allocated = 0;
 	while (allocated < ARENA_SIZE) {
 		allocated += ELEMENT_SIZE;
-		int64_t *mem = arena_alloc(&ARENA, ELEMENT_SIZE);
+		int64_t *mem = mem_arena_alloc(&ARENA, ELEMENT_SIZE);
 		TEST_ASSERT_NOT_NULL(mem)
 		*mem = -1;
 	}
@@ -60,7 +60,7 @@ static void can_allocate_all_the_given_memory(void)
 
 static void allignment_is_respected(void)
 {
-	int16_t *allocated = arena_aligned_alloc(&ARENA, sizeof(int16_t), 64);
+	int16_t *allocated = mem_arena_aligned_alloc(&ARENA, sizeof(int16_t), 64);
 	TEST_ASSERT_NOT_NULL(allocated)
 	*allocated = -1;
 	TEST_ASSERT((uintptr_t)allocated % 64 == 0)
