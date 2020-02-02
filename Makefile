@@ -74,7 +74,8 @@ build_dirs:
 	    $(shell find $(PATH_SRC)/ -type d))
 
 $(PATH_BUILD)/wayo_server: $(OBJS_APP) $(OBJS_DEPS)
-	@$(LINK) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
+	@echo LINK $@
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LINKERFLAGS) -o $@ $^
 
 test: $(patsubst $(PATH_BUILD_OBJ)/%.o,$(PATH_BUILD_TESTS)/%,$(OBJS_TESTS))
 	@$(foreach t,$^,\
