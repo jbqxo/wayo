@@ -22,7 +22,7 @@
 #include <uv.h>
 #include <mpack.h>
 
-#include "funcs.h"
+#include "caller.h"
 #include "api.h"
 #include "storage.h"
 #include "util.h"
