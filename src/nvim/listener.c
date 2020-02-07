@@ -73,7 +73,7 @@ static mpack_error_t extract_response(struct msg_context *ctx,
 				      mpack_node_t root)
 {
 	mpack_error_t err;
-	struct nvim_rpc_resp *response = &ctx->initial_event.resp;
+	struct msg_response *response = &ctx->initial_event.resp;
 
 	err = get_msgid(root, 1, &response->msgid);
 	if (err != mpack_ok) {
@@ -101,7 +101,7 @@ static mpack_error_t extract_notification(struct msg_context *ctx,
 					  mpack_node_t root)
 {
 	mpack_error_t err;
-	struct nvim_rpc_notif *notification = &ctx->initial_event.notif;
+	struct msg_notification *notification = &ctx->initial_event.notif;
 
 	err = get_str(ctx->arena, root, 1, &notification->method);
 	if (err != mpack_ok) {

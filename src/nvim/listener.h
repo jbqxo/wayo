@@ -36,11 +36,11 @@ struct msg_context {
 	struct mem_arena *arena;
 
 	struct {
-		enum nvim_rpc_type type;
+		enum msg_type type;
 		union {
-			struct nvim_rpc_req req;
-			struct nvim_rpc_resp resp;
-			struct nvim_rpc_notif notif;
+			struct msg_request req;
+			struct msg_response resp;
+			struct msg_notification notif;
 		};
 	} initial_event;
 };

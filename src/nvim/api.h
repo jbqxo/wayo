@@ -26,25 +26,25 @@
 #include <mpack.h>
 
 // Protocol Specs: https://github.com/msgpack-rpc/msgpack-rpc/blob/e6a28c4b71638b61ea11469917b030df45ef8081/spec.md
-enum nvim_rpc_type {
+enum msg_type {
 	NVIM_RPC_REQUEST = 0x0,
 	NVIM_RPC_RESPONSE = 0x1,
 	NVIM_RPC_NOTIFICATION = 0x2,
 };
 
-struct nvim_rpc_req {
+struct msg_request {
 	uint32_t msgid;
 	char *method;
 	mpack_node_t params;
 };
 
-struct nvim_rpc_resp {
+struct msg_response {
 	uint32_t msgid;
 	mpack_node_t error;
 	mpack_node_t result;
 };
 
-struct nvim_rpc_notif {
+struct msg_notification {
 	char *method;
 	mpack_node_t params;
 };
