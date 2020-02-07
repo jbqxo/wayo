@@ -35,24 +35,14 @@ struct msg_context {
 	// Memory for a request must be allocated via this arena.
 	struct mem_arena *arena;
 
-	// Protocol Specs: https://github.com/msgpack-rpc/msgpack-rpc/blob/e6a28c4b71638b61ea11469917b030df45ef8081/spec.md
 	struct {
 		enum nvim_rpc_type type;
-		// Undefined if type == Notification
-		uint32_t msgid;
 		union {
-			// Undefined if type == Response
-			char *method;
-			// Undefined if type != Response
-			mpack_node_t error;
+			struct nvim_rpc_req req;
+			struct nvim_rpc_resp resp;
+			struct nvim_rpc_notif notif;
 		};
-		union {
-			// Undefined if type == Response
-			mpack_node_t params;
-			// Undefined if type != Response
-			mpack_node_t result;
-		};
-	} data;
+	} initial_event;
 };
 
 // Interface to handle specifict type of a message.

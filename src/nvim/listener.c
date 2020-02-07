@@ -73,8 +73,9 @@ static mpack_error_t extract_response(struct msg_context *ctx,
 				      mpack_node_t root)
 {
 	mpack_error_t err;
+	struct nvim_rpc_resp *response = &ctx->initial_event.resp;
 
-	err = get_msgid(root, 1, &ctx->data.msgid);
+	err = get_msgid(root, 1, &response->msgid);
 	if (err != mpack_ok) {
 		return err;
 	}
@@ -84,14 +85,14 @@ static mpack_error_t extract_response(struct msg_context *ctx,
 	if (err != mpack_ok) {
 		return err;
 	}
-	ctx->data.error = node_error;
+	response->error = node_error;
 
 	mpack_node_t node_result = mpack_node_array_at(root, 3);
 	err = mpack_node_error(node_result);
 	if (err != mpack_ok) {
 		return err;
 	}
-	ctx->data.result = node_result;
+	response->result = node_result;
 
 	return mpack_ok;
 }
@@ -100,8 +101,9 @@ static mpack_error_t extract_notification(struct msg_context *ctx,
 					  mpack_node_t root)
 {
 	mpack_error_t err;
+	struct nvim_rpc_notif *notification = &ctx->initial_event.notif;
 
-	err = get_str(ctx->arena, root, 1, &ctx->data.method);
+	err = get_str(ctx->arena, root, 1, &notification->method);
 	if (err != mpack_ok) {
 		return err;
 	}
@@ -111,7 +113,7 @@ static mpack_error_t extract_notification(struct msg_context *ctx,
 	if (err != mpack_ok) {
 		return err;
 	}
-	ctx->data.params = node_params;
+	notification->params = node_params;
 
 	return mpack_ok;
 }
@@ -125,10 +127,10 @@ static mpack_error_t extract_data_into_ctx(struct msg_context *ctx,
 	if (mpack_node_is_nil(node_type)) {
 		return mpack_node_error(node_type);
 	}
-	ctx->data.type = (unsigned)mpack_node_int(node_type);
+	ctx->initial_event.type = (unsigned)mpack_node_int(node_type);
 
 	mpack_error_t err = mpack_ok;
-	switch (ctx->data.type) {
+	switch (ctx->initial_event.type) {
 	case NVIM_RPC_RESPONSE: {
 		err = extract_response(ctx, root);
 	} break;
@@ -163,7 +165,7 @@ static void in_read_cb(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	err = extract_data_into_ctx(ctx, &tree);
 	assert(err == mpack_ok);
 
-	switch (ctx->data.type) {
+	switch (ctx->initial_event.type) {
 	case NVIM_RPC_RESPONSE: {
 		if (l->on_response) {
 			l->on_response(ctx);
