@@ -33,7 +33,7 @@
 // Data related to the particular message from the editor.
 struct msg_context {
 	// Memory for a request must be allocated via this arena.
-	struct mem_arena *arena;
+	struct mem_stack *arena;
 
 	struct {
 		enum msg_type type;

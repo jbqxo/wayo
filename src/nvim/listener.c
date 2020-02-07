@@ -48,7 +48,7 @@ static mpack_error_t get_msgid(struct mpack_node_t root, size_t index,
 	return mpack_ok;
 }
 
-static mpack_error_t get_str(struct mem_arena *alloc, mpack_node_t root,
+static mpack_error_t get_str(struct mem_stack *arena, mpack_node_t root,
 			     size_t index, char **dest)
 {
 	mpack_error_t err;
@@ -58,7 +58,7 @@ static mpack_error_t get_str(struct mem_arena *alloc, mpack_node_t root,
 		return err;
 	}
 	size_t len = mpack_node_strlen(node) + 1;
-	char *mem = mem_arena_alloc(alloc, len);
+	char *mem = mem_stack_alloc(arena, len);
 	mpack_node_copy_cstr(node, mem, len);
 	err = mpack_node_error(node);
 	if (err != mpack_ok) {
@@ -155,7 +155,7 @@ static void in_read_cb(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	l->current_context = NULL;
 
 	mpack_node_data_t *mpack_data =
-		mem_arena_alloc(ctx->arena, sizeof(*mpack_data) * MAX_NODE_COUNT);
+		mem_stack_alloc(ctx->arena, sizeof(*mpack_data) * MAX_NODE_COUNT);
 	mpack_tree_t tree;
 	mpack_tree_init_pool(&tree, buf->base, (size_t)nread, mpack_data,
 			     MAX_NODE_COUNT);
@@ -191,18 +191,18 @@ static void alloc_cb(uv_handle_t *handle, size_t suggested, uv_buf_t *buf)
 	struct listener *l = handle->data;
 
 	// We allocate new space for memory arena from a memory pool.
-	// Then place new arena object at the beginning, and treat the rest of the given mem block
+	// Then place new allocator at the beginning, and treat the rest of the given mem block
 	// as the arena itself.
-	struct mem_arena *a = mem_pool_alloc(l->reqpool);
-	mem_arena_init(a, a + sizeof(*a), l->reqpool_block_sz - sizeof(*a));
+	struct mem_stack *a = mem_pool_alloc(l->reqpool);
+	mem_stack_init(a, a + sizeof(*a), l->reqpool_block_sz - sizeof(*a));
 	assert(a);
 
-	struct msg_context *ctx = mem_arena_alloc(a, sizeof(*ctx));
+	struct msg_context *ctx = mem_stack_alloc(a, sizeof(*ctx));
 	assert(ctx);
 	ctx->arena = a;
 	l->current_context = ctx;
 
-	buf->base = mem_arena_alloc(a, suggested);
+	buf->base = mem_stack_alloc(a, suggested);
 	assert(buf->base);
 	buf->len = suggested;
 }

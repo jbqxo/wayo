@@ -36,17 +36,6 @@ static inline uintptr_t nearest_aligned_addr(uintptr_t addr, size_t align) {
 	return (addr + align - 1) & -align;
 }
 
-struct mem_arena {
-	void *current_pos;
-	// The field represents the last available address.
-	uintptr_t edge_addr;
-};
-
-void mem_arena_init(struct mem_arena *, void *mem, size_t mem_size);
-void *mem_arena_aligned_alloc(struct mem_arena *, size_t size, size_t alignment);
-void *mem_arena_alloc(struct mem_arena *, size_t size);
-
-
 /* In the current implementation free block accounting is implemented via
  * a linked list of elements pointing to the free blocks; each element is
  * storred in a corresponding free block. */
