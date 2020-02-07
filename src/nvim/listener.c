@@ -135,10 +135,6 @@ static mpack_error_t extract_data_into_ctx(struct msg_context *ctx,
 	case NVIM_RPC_NOTIFICATION: {
 		err = extract_notification(ctx, root);
 	} break;
-	case NVIM_RPC_REQUEST: {
-		// Neovim should not send us any requests.
-		assert(false);
-	} break;
 	default: {
 		assert(false);
 	} break;
@@ -168,11 +164,6 @@ static void in_read_cb(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	assert(err == mpack_ok);
 
 	switch (ctx->data.type) {
-	case NVIM_RPC_REQUEST: {
-		if (l->on_request) {
-			l->on_request(ctx);
-		}
-	} break;
 	case NVIM_RPC_RESPONSE: {
 		if (l->on_response) {
 			l->on_response(ctx);
@@ -182,6 +173,9 @@ static void in_read_cb(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 		if (l->on_notify) {
 			l->on_notify(ctx);
 		}
+	} break;
+	default: {
+		assert(false);
 	} break;
 	}
 
@@ -213,15 +207,14 @@ static void alloc_cb(uv_handle_t *handle, size_t suggested, uv_buf_t *buf)
 
 void listener_init(struct listener *l, uv_loop_t *loop,
 		   struct mem_stack *glob_alloc, struct mem_pool *reqpool,
-		   size_t reqpool_block_sz, fn_handler on_request,
-		   fn_handler on_response, fn_handler on_notify)
+		   size_t reqpool_block_sz, fn_handler on_response,
+		   fn_handler on_notify)
 {
 	memset(l, 0, sizeof(*l));
 	l->reqpool = reqpool;
 	l->reqpool_block_sz = reqpool_block_sz;
 	l->glob_alloc = glob_alloc;
 	l->loop = loop;
-	l->on_request = on_request;
 	l->on_response = on_response;
 	l->on_notify = on_notify;
 

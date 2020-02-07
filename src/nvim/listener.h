@@ -67,7 +67,6 @@ struct listener {
 	uv_loop_t *loop;
 	uv_stream_t *in;
 
-	fn_handler on_request;
 	fn_handler on_response;
 	fn_handler on_notify;
 
@@ -81,5 +80,5 @@ struct listener {
 
 void listener_init(struct listener *l, uv_loop_t *loop,
 		   struct mem_stack *glob_alloc, struct mem_pool *reqpool,
-		   size_t reqpool_block_sz, fn_handler on_request,
-		   fn_handler on_response, fn_handler on_notify);
+		   size_t reqpool_block_sz, fn_handler on_response,
+		   fn_handler on_notify);
