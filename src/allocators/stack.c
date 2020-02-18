@@ -24,11 +24,11 @@
 
 #include "allocators.h"
 
-// In the stack allocator, we could simply store the cursor in the memory block and increase/decrease it during alloc/free.
-// But if we have this header, we may catch some obscure bugs when somebody frees memory not in a LIFO fashion.
 struct header {
 	void *prev_cursor;
 
+// We could simply store the cursor in the memory block and increase/decrease it during alloc/free.
+// But if we have this header, we may catch some obscure bugs when somebody frees memory not in a LIFO fashion.
 #ifndef NDEBUG
 	size_t block_size;
 #endif
@@ -53,7 +53,6 @@ void *mem_stack_aligned_alloc(struct mem_stack *s, size_t size, size_t alignment
 		nearest_aligned_addr((uintptr_t)s->cursor, alignment);
 
 	// If there is not enough space for the header, move to the next aligned position.
-	// Inefficient, but I do not see other solutions.
 	size_t free_space = aligned_addr - (uintptr_t)s->cursor;
 	while (free_space < sizeof(struct header)) {
 		aligned_addr += alignment;
@@ -85,7 +84,7 @@ void mem_stack_free(struct mem_stack *s, void *block)
 
 	struct header *h = (void*)((uintptr_t)block - sizeof(struct header));
 #ifndef NDEBUG
-	// It will be awkward if somebody will try to deallocate not in a LIFO fashion.
+	// Check that dealocation is happening in LIFO fashion.
 	assert((uintptr_t)block + h->block_size == (uintptr_t)s->cursor);
 #endif
 	s->cursor = h->prev_cursor;
