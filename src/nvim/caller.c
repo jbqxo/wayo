@@ -1,44 +1,40 @@
-/* Copyright (c) 2019 Maxim Lyapin 
- *  
- *  Permission is hereby granted, free of charge, to any person obtaining a copy 
- *  of this software and associated documentation files (the "Software"), to deal 
- *  in the Software without restriction, including without limitation the rights 
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- *  copies of the Software, and to permit persons to whom the Software is 
- *  furnished to do so, subject to the following conditions: 
- *   
- *  The above copyright notice and this permission notice shall be included in all 
- *  copies or substantial portions of the Software. 
- *   
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- *  SOFTWARE.
- */
+#include <unistd.h>
 
 #include <uv.h>
 #include <mpack.h>
 
 #include "caller.h"
 #include "api.h"
-#include "storage.h"
 #include "util.h"
 
-static void free_write_buffer(uv_write_t *req, int status)
-{
-	if (status < 0) {
-		// TODO(Maxim Lyapin): Log failed write
+static msgid_t alloc_msgid(struct caller *c) {
+	if (c->msgid == MSGID_MAX) {
+		c->msgid = 0;
 	}
-	xfree(req->data);
+	return c->msgid++;
+}
+
+
+void caller_init(struct caller *c, uv_loop_t *loop, struct mem_stack *global) {
+	c->msgid = 0;
+	c->loop = loop;
+
+	int err = 0;
+	uv_tty_t *tty_out = mem_stack_alloc(global, sizeof(*tty_out));
+	err = uv_tty_init(loop, tty_out, STDOUT_FILENO, /* unused */ 0);
+	assert(!err);
+
+	c->out = (uv_stream_t*)tty_out;
 }
 
 // Global functions
-void nvim_command(struct nvim_api *api, const char *restrict cmd)
+void nvim_command(
+		struct caller *caller,
+		struct msg *ctx,
+		const char *cmd,
+		cmd_cb cb
+		)
 {
-	// TODO(Maxim Lyapin): Replace with memory pool.
 	uv_buf_t *request_buffer = xmalloc(sizeof(*request_buffer));
 
 	mpack_writer_t writer;
@@ -47,7 +43,7 @@ void nvim_command(struct nvim_api *api, const char *restrict cmd)
 
 	mpack_start_array(&writer, 4);
 	mpack_write_int(&writer, NVIM_RPC_REQUEST);
-	mpack_write_u32(&writer, nvim_next_msgid(api));
+	mpack_write_u32(&writer, alloc_msgid(caller));
 	mpack_write_cstr(&writer, "nvim_command");
 	mpack_write_cstr(&writer, cmd);
 	mpack_finish_array(&writer);
@@ -59,6 +55,5 @@ void nvim_command(struct nvim_api *api, const char *restrict cmd)
 
 	uv_write_t wreq;
 	wreq.data = request_buffer;
-	uv_write(&wreq, api->out, request_buffer, 1, free_write_buffer);
-	// TODO(Maxim Lyapin): Free request_buffer.base
+	/* uv_write(&wreq, api->out, request_buffer, 1, free_write_buffer); */
 }
